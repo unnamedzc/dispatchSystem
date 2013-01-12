@@ -1,1 +1,26 @@
-<id></id>
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<app>
+	<tab>
+		<tabId>0</tabId>
+		<tabName>司机</tabName>
+		<elements>
+			<e1 name="姓名"/>
+			<e2 name="照片" isUrl="1"/>
+			<e3 name="指纹" isUrl="1"/>
+			<e4 name="身份证号"/>
+			<e5 name="现居住地"/>
+			<e6 name="手机号"/>
+			<e7 name="是否智能手机" isComBox="1"/>
+			<e8 name="固定电话"/>
+			<e9 name="驾驶证号"/>
+			<e10 name="司机从业资格证"/>
+		</elements>
+	</tab>
+	<tab isTable="1">
+		<tabId>2</tabId>
+		<tabName>交易记录</tabName>
+		<elements>
+			<e1 name="时间"/>
+		</elements>
+	</tab>
+</app>
