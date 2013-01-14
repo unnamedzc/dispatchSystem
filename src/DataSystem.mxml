@@ -3,7 +3,7 @@
 <s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
 					   xmlns:s="library://ns.adobe.com/flex/spark"
 					   xmlns:mx="library://ns.adobe.com/flex/mx"
-					   xmlns:MyComponent="MyComponent.*" initialize="getData()" creationComplete="assignData()">
+					   xmlns:MyComponent="com.jeff.MyComponent.*" initialize="getData()" creationComplete="assignData()" xmlns:myComponents="myComponents.*">
 	
 	<fx:Style>
 		@namespace "library://ns.adobe.com/flex/spark";
@@ -16,41 +16,57 @@
 			color: #F00E34;
 		}
 		
-		NavigatorContent {
+		/* NavigatorContent {
 			chromeColor: #9999CC;
 			color: #410FF5;
 			cornerRadius:8;
-		}
+		} */
 	</fx:Style>
 	<fx:Script>
-		<![CDATA[
-			import MyComponent.MyTab;
-			private var _xmlData:XML=new XML;
+		<![CDATA[			
+			import Values.GlobalValue;
+			
+			import mx.core.IFlexDisplayObject;
+			import mx.core.IVisualElement;
+			import mx.core.IVisualElementContainer;
+			import mx.events.ResizeEvent;
+			import mx.managers.PopUpManager;
+			
+			import myComponents.TitleWindows;
+			//private var _xmlData:XML=new XML;
 			
 			public function getData():void
 			{
 				var request:URLRequest = new URLRequest("/data/tableList.xml");  
 				var loader:URLLoader = new URLLoader(request);  
 				loader.addEventListener(Event.COMPLETE, loaderCompleteHandler); 
+			
+				maximize();
+				showStatusBar=false;					
 			}
 			private function loaderCompleteHandler(event:Event):void
 			{
-				_xmlData=XML(event.target.data);
-					
+				GlobalValue._xmlData=XML(event.target.data);					
 			}
 			public function assignData():void
 			{
-				trace("assignData",_xmlData.tab.length());
-				var _len:uint=_xmlData.tab.length();
-				var _tempXml:XML;
-				for(var i:uint;i<_len;++i)
+				this.addEventListener(ResizeEvent.RESIZE,onC)
+				function onC(e:ResizeEvent):void
 				{
-					//trace(_xmlData[i])
-					var myT:MyTab=new MyTab();
-					myT.label=_xmlData.tab[i].tabName;
-					tn.addItem(myT);
+					GlobalValue._stageHeight=stage.height;
+					GlobalValue._stageWidth=stage.width;
+					//dispatchEvent to update the comp
 				}
 				
+			}
+			private function addTitleWin():void
+			{				
+				var addTileWin:TitleWindows=TitleWindows(PopUpManager.createPopUp(this, TitleWindows , true));
+				addTileWin.addEventListener("close", closeHandler);
+			}
+			private function closeHandler(event:Event):void {
+				event.target.removeEventListener("close", closeHandler);
+				PopUpManager.removePopUp(event.target as IFlexDisplayObject);
 			}
 		]]>
 	</fx:Script>
@@ -58,21 +74,45 @@
 		<s:HorizontalLayout verticalAlign="middle" horizontalAlign="center" />
 	</s:layout>
 	
-	<s:Panel title="个体驾驶员的信息系统" width="100%" height="100%"
-			 color="0x000000" 
-			 borderAlpha="0.15" fontSize="18">
+	<s:Panel title="个体驾驶员信息系统" width="100%" height="100%"
+			 fontSize="17">
 		
 		<s:layout>
-			<s:VerticalLayout paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="10"/>
-		</s:layout>		
-		<mx:TabNavigator id="tn"  width="100%" height="100%" color="0x323232"/>
-			<!-- Define each panel using a VBox container. -->		
-		<s:HGroup>
-			<s:Button label="Select Tab 1" click="tn.selectedIndex=0" color="0x545454" />
-			<s:Button label="Select Tab 2" click="tn.selectedIndex=1" color="0x545454" />
-			<!--<s:Button label="Select Tab 3" click="tn.selectedIndex=2" color="0x545454" />-->
-		</s:HGroup>
-		
-	</s:Panel>
-	
+			<s:VerticalLayout paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0"/>
+		</s:layout>	
+		<mx:HDividedBox width="100%" height="100%">
+			<s:VGroup width="35%" height="100%">
+				<s:VGroup>										
+					<s:DropDownList id="direction" prompt="请选择查找类型" width="70%">
+						<s:dataProvider>
+							<mx:ArrayList>
+								<fx:String>姓名</fx:String>
+								<fx:String>身份证号</fx:String>
+								<fx:String>手机号</fx:String>
+								<fx:String>固定电话</fx:String>
+								<fx:String>驾驶证</fx:String>
+							</mx:ArrayList>
+						</s:dataProvider>
+					</s:DropDownList>						
+					
+					<s:TextInput id="searchText"/>
+					<s:Button label="查询"/>
+				</s:VGroup>				
+				<s:List height="100%" width="100%"/>			
+			</s:VGroup>
+			<s:VGroup width="65%" height="100%">
+				<s:HGroup>
+					<s:Button label="添加" click="addTitleWin()"/>
+					<s:Button label="删除"/>
+					<s:Button label="修改"/>
+				</s:HGroup>
+				<myComponents:MainSheet id="mainTable" width="100%" height="100%"/>
+			</s:VGroup>
+			<!--<mx:TabNavigator id="tn"  width="100%" height="100%" color="0x323232">
+					
+				<myComponents:TableTab myXML="{_xmlData}"/>
+			</mx:TabNavigator>-->
+			
+		</mx:HDividedBox>	
+	</s:Panel>	
 </s:WindowedApplication>

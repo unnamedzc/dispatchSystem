@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:NavigatorContent xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					xmlns:s="library://ns.adobe.com/flex/spark" 
+					xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" creationComplete="initForm()">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.jeff.dataView.dataElement.MyHGroupLabel;
+			[Bindable]
+			private var _myXML:XML;
+			private function initForm():void
+			{
+				trace(_myXML+"end");
+				/* var t1:MyHGroupLabel=new MyHGroupLabel("1","2");
+				group.addElement(t1);
+				var t2:MyHGroupLabel=new MyHGroupLabel("2","3");
+				group.addElement(t2);
+				t2.y=1000; */
+				
+			}
+			
+			public function set myXML($xml:XML):void
+			{
+				_myXML=$xml;
+				
+			}
+			
+		]]>
+	</fx:Script>	
+	<!--<s:Scroller id="scroller"				
+				width="100%" height="100%">
+		<s:Group>
+			<s:DataGrid id="dataContainer" width="100%" height="100%"/>
+		</s:Group>
+	</s:Scroller>-->
+</s:NavigatorContent>

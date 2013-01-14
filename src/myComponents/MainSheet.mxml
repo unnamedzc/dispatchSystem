@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:DataGrid xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			 xmlns:s="library://ns.adobe.com/flex/spark" 
+			 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<mx:columns>
+		<mx:DataGridColumn dataField="1" headerText="姓名"/>
+		<mx:DataGridColumn dataField="2" headerText="身份证号"/>
+		<mx:DataGridColumn dataField="3" headerText="手机号"/>			
+		<mx:DataGridColumn dataField="5" headerText="固定电话"/>
+		<mx:DataGridColumn dataField="6" headerText="驾驶证号"/>
+	</mx:columns>
+</mx:DataGrid>

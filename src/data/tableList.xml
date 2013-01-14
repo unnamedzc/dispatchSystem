@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <app>
-	<tab>
+	<tab isTable="1">
 		<tabId>0</tabId>
 		<tabName>司机</tabName>
 		<elements>
+		
 			<e1 name="姓名"/>
 			<e2 name="照片" isUrl="1"/>
 			<e3 name="指纹" isUrl="1"/>
@@ -13,10 +14,23 @@
 			<e7 name="是否智能手机" isComBox="1"/>
 			<e8 name="固定电话"/>
 			<e9 name="驾驶证号"/>
-			<e10 name="司机从业资格证"/>
+			<e10 name="司机从业资格证"/>			
+			
 		</elements>
 	</tab>
-	<tab isTable="1">
+	<tab>
+		<tabId>1</tabId>
+		<tabName>车辆</tabName>
+		<elements>	
+			
+			<e1 name="车头和车挂的车牌号"/>
+			<e2 name="行驶证"/>
+			<e3 name="车辆是否有重大交通事故" isComBox="1"/>
+			
+		</elements>
+	
+	</tab>
+	<tab isTable="0">
 		<tabId>2</tabId>
 		<tabName>交易记录</tabName>
 		<elements>

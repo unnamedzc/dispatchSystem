@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" title="添加数据" autoLayout="true" addedToStage="onAdd()" creationComplete="onCreated()">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import Values.GlobalValue;
+			
+			import mx.events.ResizeEvent;		
+			
+			private function onAdd():void
+			{
+				
+				
+				
+			}
+			private function onCreated():void
+			{
+				var _len:uint=GlobalValue._xmlData.tab.length();
+				var _tempXml:XML;				
+				for(var i:uint;i<_len;++i)
+				{					
+					_tempXml=XML(GlobalValue._xmlData.tab[i].elements);	
+					if(uint(GlobalValue._xmlData.tab[i].@isTable)==1)
+					{
+						var myT:TableTab=new TableTab();
+						myT.myXML=_tempXml
+						tn.addItem(myT);						
+						myT.label=GlobalValue._xmlData.tab[i].tabName;
+					}else
+					{
+						var myS:SheetTab=new SheetTab();						
+						tn.addItem(myS);						
+						myS.label=GlobalValue._xmlData.tab[i].tabName;
+					}
+				}  
+			}
+		]]>
+	</fx:Script>
+	<mx:TabNavigator id="tn"  width="100%" height="100%" color="0x323232"/>
+</s:TitleWindow>
