@@ -1,23 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:NavigatorContent xmlns:fx="http://ns.adobe.com/mxml/2009" 
 					xmlns:s="library://ns.adobe.com/flex/spark" 
-					xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" creationComplete="initForm()">
+					xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" fontSize="20" creationComplete="initForm()">
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
+			import com.jeff.dataView.dataElement.MyHGroupCombo;
 			import com.jeff.dataView.dataElement.MyHGroupLabel;
+			
+			import mx.controls.Image;
 			[Bindable]
 			private var _myXML:XML;
 			private function initForm():void
 			{
-				trace(_myXML+"end");
-				/* var t1:MyHGroupLabel=new MyHGroupLabel("1","2");
-				group.addElement(t1);
-				var t2:MyHGroupLabel=new MyHGroupLabel("2","3");
-				group.addElement(t2);
-				t2.y=1000; */
+				
+				var	_len:uint=_myXML.e.length();
+				for(var i:uint=0;i<_len;++i)
+				{
+					trace(_myXML.e[i].@isUrl,_myXML.e[i].@isCombBox)
+					if(_myXML.e[i].@isUrl=="1"){
+						var myI:Image=new Image;
+					}
+					else if(_myXML.e[i].@isComBox=="1"){
+						var myC:MyHGroupCombo=new MyHGroupCombo(_myXML.e[i].@name);
+						v1.addElement(myC);
+					}else
+					{
+						var myE:MyHGroupLabel=new MyHGroupLabel(_myXML.e[i].@name,"111");
+						v1.addElement(myE);
+					}
+				}
 				
 			}
 			
@@ -28,11 +42,16 @@
 			}
 			
 		]]>
-	</fx:Script>	
-	<!--<s:Scroller id="scroller"				
-				width="100%" height="100%">
-		<s:Group>
-			<s:DataGrid id="dataContainer" width="100%" height="100%"/>
-		</s:Group>
-	</s:Scroller>-->
+	</fx:Script>
+	<s:layout>
+		<s:VerticalLayout paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="10"/>
+	</s:layout>
+	<s:Scroller id="scroller"				
+				width="100%" height="100%">		
+		<s:HGroup gap="20">
+			<s:VGroup id="v1" gap="20"/>			
+			<s:VGroup id="v2" gap="20"/>
+		</s:HGroup>		
+	</s:Scroller>
+		
 </s:NavigatorContent>

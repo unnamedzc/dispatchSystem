@@ -3,7 +3,7 @@
 <s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
 					   xmlns:s="library://ns.adobe.com/flex/spark"
 					   xmlns:mx="library://ns.adobe.com/flex/mx"
-					   xmlns:MyComponent="com.jeff.MyComponent.*" initialize="getData()" creationComplete="assignData()" xmlns:myComponents="myComponents.*">
+					   xmlns:MyComponent="com.jeff.MyComponent.*" fontSize="20"  title="个体驾驶员信息系统" initialize="getData()" creationComplete="assignData()" resize="onResize()" xmlns:myComponents="myComponents.*">
 	
 	<fx:Style>
 		@namespace "library://ns.adobe.com/flex/spark";
@@ -14,13 +14,15 @@
 		NavigatorContent ToggleButton:disabledAndSelected {
 			chromeColor: #9999CC;
 			color: #F00E34;
-		}
+			fontSize: 20;
+		} 
 		
-		/* NavigatorContent {
+		/*  NavigatorContent {
 			chromeColor: #9999CC;
 			color: #410FF5;
 			cornerRadius:8;
-		} */
+			fontSize: 20;
+		}  */
 	</fx:Style>
 	<fx:Script>
 		<![CDATA[			
@@ -34,7 +36,7 @@
 			
 			import myComponents.TitleWindows;
 			//private var _xmlData:XML=new XML;
-			
+			private var addTileWin:TitleWindows;
 			public function getData():void
 			{
 				var request:URLRequest = new URLRequest("/data/tableList.xml");  
@@ -50,19 +52,31 @@
 			}
 			public function assignData():void
 			{
-				this.addEventListener(ResizeEvent.RESIZE,onC)
-				function onC(e:ResizeEvent):void
-				{
-					GlobalValue._stageHeight=stage.height;
-					GlobalValue._stageWidth=stage.width;
-					//dispatchEvent to update the comp
-				}
+				
 				
 			}
+			private function onResize():void
+			{
+				trace("resize")				
+				_resizeAllComponent()
+			}
+			//弹出添加窗口
 			private function addTitleWin():void
-			{				
-				var addTileWin:TitleWindows=TitleWindows(PopUpManager.createPopUp(this, TitleWindows , true));
-				addTileWin.addEventListener("close", closeHandler);
+			{		
+				//应该设为全局
+				addTileWin=TitleWindows(PopUpManager.createPopUp(this, TitleWindows,true));
+				addTileWin.addEventListener("close", closeHandler);				
+				addTileWin.x=20;
+				addTileWin.y=20;
+				_resizeAllComponent()
+			}
+			private function _resizeAllComponent():void
+			{
+				if(addTileWin)
+				{
+					addTileWin.width=this.width-40;
+					addTileWin.height=this.height-40;
+				}
 			}
 			private function closeHandler(event:Event):void {
 				event.target.removeEventListener("close", closeHandler);
@@ -71,19 +85,14 @@
 		]]>
 	</fx:Script>
 	<s:layout>
-		<s:HorizontalLayout verticalAlign="middle" horizontalAlign="center" />
+		<s:VerticalLayout paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="10"/>
 	</s:layout>
 	
-	<s:Panel title="个体驾驶员信息系统" width="100%" height="100%"
-			 fontSize="17">
-		
-		<s:layout>
-			<s:VerticalLayout paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0"/>
-		</s:layout>	
-		<mx:HDividedBox width="100%" height="100%">
+	<mx:HDividedBox width="100%" height="100%">
+				
 			<s:VGroup width="35%" height="100%">
-				<s:VGroup>										
-					<s:DropDownList id="direction" prompt="请选择查找类型" width="70%">
+				<s:VGroup >										
+					<s:DropDownList id="direction" prompt="请选择查找类型">
 						<s:dataProvider>
 							<mx:ArrayList>
 								<fx:String>姓名</fx:String>
@@ -94,12 +103,14 @@
 							</mx:ArrayList>
 						</s:dataProvider>
 					</s:DropDownList>						
-					
-					<s:TextInput id="searchText"/>
-					<s:Button label="查询"/>
+					<s:HGroup>
+						<s:TextInput id="searchText"/>
+						<s:Button label="查询"/>
+					</s:HGroup>					
 				</s:VGroup>				
 				<s:List height="100%" width="100%"/>			
-			</s:VGroup>
+			</s:VGroup>		
+			<!--右边主控制区域-->
 			<s:VGroup width="65%" height="100%">
 				<s:HGroup>
 					<s:Button label="添加" click="addTitleWin()"/>
@@ -107,12 +118,8 @@
 					<s:Button label="修改"/>
 				</s:HGroup>
 				<myComponents:MainSheet id="mainTable" width="100%" height="100%"/>
-			</s:VGroup>
-			<!--<mx:TabNavigator id="tn"  width="100%" height="100%" color="0x323232">
-					
-				<myComponents:TableTab myXML="{_xmlData}"/>
-			</mx:TabNavigator>-->
+			</s:VGroup>			
 			
-		</mx:HDividedBox>	
-	</s:Panel>	
+	</mx:HDividedBox>	
+		
 </s:WindowedApplication>
