@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:NavigatorContent xmlns:fx="http://ns.adobe.com/mxml/2009" 
 					xmlns:s="library://ns.adobe.com/flex/spark" 
-					xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" fontSize="20" creationComplete="initForm()">
+					xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" fontSize="20" addedToStage="onAdd()" creationComplete="initForm()">
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 	</fx:Declarations>
@@ -10,48 +10,67 @@
 			import com.jeff.dataView.dataElement.MyHGroupCombo;
 			import com.jeff.dataView.dataElement.MyHGroupLabel;
 			
-			import mx.controls.Image;
+			import myElements.DragImage;
+			import myElements.MyScroller;
+			
+			import spark.components.HGroup;
+			import spark.components.VGroup;
 			[Bindable]
 			private var _myXML:XML;
-			private function initForm():void
+			private function onAdd():void
 			{
+				//trace(scroller)
+			}
+			private function initForm():void
+			{		
+				var _myScro:MyScroller=new MyScroller();
+				this.addElement(_myScro);
 				
+			/* 	_myG.gap=200;
+				var _mysubG1:VGroup=new VGroup();
+				var _mysubG2:VGroup=new VGroup();
+				_mysubG1.gap=20;
+				_mysubG2.gap=5;
+				///=====================================
+				_myG.addElement(_mysubG1);
+				_myG.addElement(_mysubG2); */
+				///=====================================
+				//trace(_myScro.GetV1());
 				var	_len:uint=_myXML.e.length();
+				
 				for(var i:uint=0;i<_len;++i)
-				{
-					trace(_myXML.e[i].@isUrl,_myXML.e[i].@isCombBox)
+				{				
 					if(_myXML.e[i].@isUrl=="1"){
-						var myI:Image=new Image;
+						var myI:DragImage=new DragImage()
+						myI.title=_myXML.e[i].@name;
+						_myScro._mysubG2.addElement(myI);
+						
 					}
 					else if(_myXML.e[i].@isComBox=="1"){
 						var myC:MyHGroupCombo=new MyHGroupCombo(_myXML.e[i].@name);
-						v1.addElement(myC);
+						_myScro._mysubG1.addElement(myC);
 					}else
 					{
 						var myE:MyHGroupLabel=new MyHGroupLabel(_myXML.e[i].@name,"111");
-						v1.addElement(myE);
+						_myScro._mysubG1.addElement(myE);
 					}
-				}
-				
-			}
-			
+				}				
+			}			
 			public function set myXML($xml:XML):void
 			{
 				_myXML=$xml;
 				
-			}
-			
+			}			
 		]]>
 	</fx:Script>
 	<s:layout>
 		<s:VerticalLayout paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="10"/>
 	</s:layout>
-	<s:Scroller id="scroller"				
+	<!--<s:Scroller id="scroller"				
 				width="100%" height="100%">		
-		<s:HGroup gap="20">
+		<s:HGroup gap="200">
 			<s:VGroup id="v1" gap="20"/>			
-			<s:VGroup id="v2" gap="20"/>
+			<s:VGroup id="v2" gap="10"/>
 		</s:HGroup>		
-	</s:Scroller>
-		
+	</s:Scroller>	-->	
 </s:NavigatorContent>

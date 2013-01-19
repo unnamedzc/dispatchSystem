@@ -43,7 +43,7 @@
 				var loader:URLLoader = new URLLoader(request);  
 				loader.addEventListener(Event.COMPLETE, loaderCompleteHandler); 
 			
-				maximize();
+				//maximize();
 				showStatusBar=false;					
 			}
 			private function loaderCompleteHandler(event:Event):void
@@ -81,6 +81,7 @@
 			private function closeHandler(event:Event):void {
 				event.target.removeEventListener("close", closeHandler);
 				PopUpManager.removePopUp(event.target as IFlexDisplayObject);
+				System.gc();
 			}
 		]]>
 	</fx:Script>
@@ -118,8 +119,6 @@
 					<s:Button label="修改"/>
 				</s:HGroup>
 				<myComponents:MainSheet id="mainTable" width="100%" height="100%"/>
-			</s:VGroup>			
-			
-	</mx:HDividedBox>	
-		
+			</s:VGroup>				
+	</mx:HDividedBox>		
 </s:WindowedApplication>

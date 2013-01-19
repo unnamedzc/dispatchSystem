@@ -3,8 +3,7 @@
 	<tab isTable="1">
 		<tabId>0</tabId>
 		<tabName>司机</tabName>
-		<elements>
-		
+		<elements>		
 			<e name="姓名"/>			
 			<e name="身份证号"/>
 			<e name="现居住地"/>
@@ -14,27 +13,61 @@
 			<e name="驾驶证号"/>
 			<e name="司机从业资格证"/>
 			<e name="照片" isUrl="1"/>
-			<e name="指纹" isUrl="1"/>		
-			
+			<e name="指纹" isUrl="1"/>			
 		</elements>
 	</tab>
-	<tab>
+	<tab isTable="1">
 		<tabId>1</tabId>
 		<tabName>车辆</tabName>
-		<elements>	
-			
+		<elements>			
 			<e name="车头和车挂的车牌号"/>
 			<e name="行驶证"/>
-			<e name="车辆是否有重大交通事故" isComBox="1"/>
-			
-		</elements>
-	
+			<e name="车辆是否有重大交通事故" isComBox="1"/>	
+			<e name="车型"/>
+			<e name="车辆照片" isUrl="1"/>
+			<e name="箱子尺寸"/>
+			<e name="挂靠信息"/>
+			<e name="挂靠公司固定电话"/>
+			<e name="车辆营运证（有效期）"/>	
+			<e name="车辆年检"/>
+			<e name="营运证的年检"/>
+			<e name="保险保单信息（保险有效期，险种）"/>
+			<e name="是否有GPS" isComBox="1"/>
+		</elements>	
 	</tab>
 	<tab isTable="0">
 		<tabId>2</tabId>
-		<tabName>交易记录</tabName>
+		<tabName>交易记录/交易评价</tabName>
 		<elements>
-			<e1 name="时间"/>
+			<e name="时间"/>
+			<e name="起运地"/>
+			<e name="目的地"/>
+			<e name="司机报价"/>
+			<e name="成交价格（实际给付多少油卡多少现金）"/>
+			<e name="货量信息（体积和重量）"/>
+			<e name="单号"/>
+			<e name="叫车人"/>
+			<e name="准点情况"/>
+			<e name="破损情况"/>
+			<e name="灭失情况"/>
+			<e name="运行时间"/>
+			<e name="始发地调度评价"/>
+			<e name="目的地调度评价"/>			
+		</elements>
+	</tab>
+	<tab isTable="1">
+		<tabId>3</tabId>
+		<tabName>查询</tabName>
+		<elements>
+			<e name="查询车辆位置"/>
+			<e name="查询货物位置"/>
+		</elements>
+	</tab>
+	<tab isTable="1">
+		<tabId>4</tabId>
+		<tabName>电话预约</tabName>
+		<elements>
+			<e name="司机或叫车人在不知对方有无业务的情况下，用电话沟通的方式寻车、寻价、寻业务"/>			
 		</elements>
 	</tab>
 </app>

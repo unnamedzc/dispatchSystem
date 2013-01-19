@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Scroller xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			xmlns:s="library://ns.adobe.com/flex/spark" 
+			xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" addedToStage="addToStage()">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[	
+			import spark.components.HGroup;
+			import spark.components.VGroup;
+			[Bindable]
+			public var _mysubG1:VGroup=new VGroup();
+			public	var _mysubG2:HGroup=new HGroup();
+			private var _myG:HGroup=new HGroup();
+			
+			private function addToStage():void
+			{	
+				this.viewport=_myG;	
+				_myG.gap=100;
+				_mysubG1.gap=20;
+				_mysubG2.gap=5;
+				_mysubG2.left=300;
+				///=====================================
+				_myG.addElement(_mysubG1);
+				_myG.addElement(_mysubG2);
+			}			
+		]]>
+	</fx:Script>	
+</s:Scroller>

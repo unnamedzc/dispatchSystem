@@ -9,18 +9,19 @@
 		<![CDATA[
 			import Values.GlobalValue;
 			
-			import mx.events.ResizeEvent;		
+			import mx.events.ResizeEvent;
+			import mx.managers.PopUpManager;
+			
+			import spark.components.NavigatorContent;		
 			
 			private function onAdd():void
 			{
-				trace("titleWin ")
-				
-				
+				trace("titleWin ")				
 			}
 			private function onCreated():void
 			{
 				var _len:uint=GlobalValue._xmlData.tab.length();
-				var _tempXml:XML;				
+				var _tempXml:XML;
 				for(var i:uint;i<_len;++i)
 				{					
 					_tempXml=XML(GlobalValue._xmlData.tab[i].elements);	
@@ -28,8 +29,9 @@
 					{
 						var myT:TableTab=new TableTab();
 						myT.myXML=_tempXml
-						tn.addItem(myT);						
+						tn.addElement(myT);	
 						myT.label=GlobalValue._xmlData.tab[i].tabName;
+						
 					}else
 					{
 						var myS:SheetTab=new SheetTab();						
@@ -38,6 +40,10 @@
 					}
 				}  
 			}
+			private function onChangeTab(e:Event):void
+			{
+				trace("changeTab:",e.target.name)
+			}
 		]]>
 	</fx:Script>
 	<s:layout>
@@ -45,13 +51,9 @@
 	</s:layout>
 	<s:VGroup width="100%" height="100%">
 		<s:HGroup>			
-			<s:Button label="添加"/>
-			<s:Button label="取消"/>
+			<s:Button label="确定"/>
+			<s:Button label="取消" click="PopUpManager.removePopUp(this);System.gc()"/>
 		</s:HGroup>
 		<mx:TabNavigator id="tn" height="100%" width="100%" color="0x323232"/>
-		
-		
 	</s:VGroup>
-	
-	
 </s:TitleWindow>

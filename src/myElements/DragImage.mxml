@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Panel title="拖动" xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="250" height="350" added="addedToCom()">
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			import mx.managers.DragManager;
+			
+			import spark.events.IndexChangeEvent;
+			
+			//private var fileArray:ArrayCollection;
+			[Bindable]
+			public var ImageUrl:String;
+			protected function addedToCom():void
+			{
+				addEventListener(NativeDragEvent.NATIVE_DRAG_ENTER, dragEnter);
+				addEventListener(NativeDragEvent.NATIVE_DRAG_DROP, dragDrop);
+				//fileArray = new ArrayCollection();
+				//fileList.dataProvider = fileArray;
+			}
+			
+			private function dragEnter(e:NativeDragEvent):void
+			{
+				if(e.clipboard.hasFormat(ClipboardFormats.FILE_LIST_FORMAT))
+				{
+					DragManager.acceptDragDrop(this);
+				}            
+			}
+			
+			private function dragDrop(e:NativeDragEvent):void
+			{
+				var fileList:Array = e.clipboard.getData(ClipboardFormats.FILE_LIST_FORMAT) as Array;
+				for each (var file:File in fileList)
+				{
+					var type:String = file.type.toLowerCase();
+					//trace(type);
+					if(type == ".jpg" || type == ".jpeg" || type == ".png" ||  type == ".gif" )
+					{
+							
+						ImageUrl=file.nativePath;
+						startImage.source=ImageUrl;
+						
+					}
+				}
+			}
+			
+			protected function fileList_changeHandler(event:IndexChangeEvent):void
+			{
+				//startImage.source = (fileList.selectedItem as File).nativePath;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<!--<mx:nativeDragEnter>
+		// Event handler for when something is dragged over to the WindowedApplication
+		// Only allow files to be dragged in
+		if (event.clipboard.hasFormat(ClipboardFormats.FILE_LIST_FORMAT))
+		{
+		var files:Array = event.clipboard.getData(ClipboardFormats.FILE_LIST_FORMAT) as Array;
+		
+		// only allow a single file to be dragged in
+		if (files.length == 1)
+		{
+		DragManager.acceptDragDrop(event.currentTarget as IUIComponent);
+		setStyle("backgroundColor", 0xccccff);
+		}
+		}
+	</mx:nativeDragEnter>
+	
+	<mx:nativeDragExit>
+		// Event handler for when the drag leaves the WindowedApplication
+		setStyle("backgroundColor", 0x323232);
+	</mx:nativeDragExit>
+	
+	<mx:nativeDragDrop>
+		// Event handler for when a dragged item is dropped on the WindowedApplication
+		var arr:Array = event.clipboard.getData(ClipboardFormats.FILE_LIST_FORMAT) as Array;
+		startImage.source = (arr[0] as File).url;
+	</mx:nativeDragDrop>-->
+	
+	
+	<mx:ViewStack id="startVS" width="100%" height="100%" creationPolicy="all">
+		<mx:Canvas width="100%" height="100%">
+			<mx:Text verticalCenter="0" horizontalCenter="0">
+				<mx:htmlText><![CDATA[<font size="20"><b>拖动照片到这里</b></font>]]></mx:htmlText>
+			</mx:Text>
+		</mx:Canvas>
+		<mx:Canvas width="100%" height="100%">
+			<mx:Image id="startImage" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle" complete="startVS.selectedIndex = 1;"/>
+		</mx:Canvas>
+	</mx:ViewStack>
+	
+</s:Panel>
