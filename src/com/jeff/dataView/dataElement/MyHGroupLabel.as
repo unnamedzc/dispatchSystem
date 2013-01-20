@@ -1,16 +1,16 @@
 package com.jeff.dataView.dataElement
 {
+	import mx.containers.FormItem;
 	import mx.core.IVisualElement;
 	
-	import spark.components.HGroup;
 	import spark.components.Label;
 	import spark.components.TextInput;
 	
-	public class MyHGroupLabel extends HGroup
+	public class MyHGroupLabel extends FormItem
 	{
 		public function MyHGroupLabel($text1:String="",$text2:String="",$editable:Boolean=true)
 		{
-			var label1:Label=new Label();
+			
 			var label2:IVisualElement
 			if(!$editable)
 			{
@@ -20,9 +20,7 @@ package com.jeff.dataView.dataElement
 			{
 				label2=new TextInput();
 			}
-			label1.text=$text1;
-			
-			addElement(label1);
+			//this.label=$text1
 			addElement(label2);
 			super();
 		}

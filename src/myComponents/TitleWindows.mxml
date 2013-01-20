@@ -25,10 +25,11 @@
 				for(var i:uint;i<_len;++i)
 				{					
 					_tempXml=XML(GlobalValue._xmlData.tab[i].elements);	
-					if(uint(GlobalValue._xmlData.tab[i].@isTable)==1)
+					if(uint(GlobalValue._xmlData.tab[i].@isTable)!=0)
 					{
 						var myT:TableTab=new TableTab();
-						myT.myXML=_tempXml
+						myT.myXML=_tempXml;
+						myT.layoutStyle=uint(GlobalValue._xmlData.tab[i].@isTable)
 						tn.addElement(myT);	
 						myT.label=GlobalValue._xmlData.tab[i].tabName;
 						

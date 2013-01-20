@@ -7,11 +7,14 @@
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[	
+			import spark.components.Form;
 			import spark.components.HGroup;
 			import spark.components.VGroup;
-			[Bindable]
-			public var _mysubG1:VGroup=new VGroup();
+			//[Bindable]
+			private var _mysubG1:VGroup=new VGroup();			
 			public	var _mysubG2:HGroup=new HGroup();
+			//for test
+			public var _myForm:Form=new Form();
 			private var _myG:HGroup=new HGroup();
 			
 			private function addToStage():void
@@ -22,8 +25,9 @@
 				_mysubG2.gap=5;
 				_mysubG2.left=300;
 				///=====================================
-				_myG.addElement(_mysubG1);
+				_myG.addElement(_mysubG1);				
 				_myG.addElement(_mysubG2);
+				_mysubG1.addElement(_myForm);
 			}			
 		]]>
 	</fx:Script>	

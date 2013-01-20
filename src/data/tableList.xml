@@ -63,7 +63,7 @@
 			<e name="查询货物位置"/>
 		</elements>
 	</tab>
-	<tab isTable="1">
+	<tab isTable="2">
 		<tabId>4</tabId>
 		<tabName>电话预约</tabName>
 		<elements>

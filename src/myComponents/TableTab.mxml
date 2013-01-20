@@ -9,6 +9,9 @@
 		<![CDATA[
 			import com.jeff.dataView.dataElement.MyHGroupCombo;
 			import com.jeff.dataView.dataElement.MyHGroupLabel;
+			import com.jeff.dataView.dataElement.MyVGroupText;
+			
+			import mx.core.IVisualElement;
 			
 			import myElements.DragImage;
 			import myElements.MyScroller;
@@ -17,6 +20,8 @@
 			import spark.components.VGroup;
 			[Bindable]
 			private var _myXML:XML;
+			[Bindable]
+			private var _layoutStyle:uint;
 			private function onAdd():void
 			{
 				//trace(scroller)
@@ -24,18 +29,8 @@
 			private function initForm():void
 			{		
 				var _myScro:MyScroller=new MyScroller();
-				this.addElement(_myScro);
-				
-			/* 	_myG.gap=200;
-				var _mysubG1:VGroup=new VGroup();
-				var _mysubG2:VGroup=new VGroup();
-				_mysubG1.gap=20;
-				_mysubG2.gap=5;
-				///=====================================
-				_myG.addElement(_mysubG1);
-				_myG.addElement(_mysubG2); */
-				///=====================================
-				//trace(_myScro.GetV1());
+				this.addElement(_myScro);		
+				//_myScro._mysubG1.horizontalAlign="center";
 				var	_len:uint=_myXML.e.length();
 				
 				for(var i:uint=0;i<_len;++i)
@@ -48,11 +43,20 @@
 					}
 					else if(_myXML.e[i].@isComBox=="1"){
 						var myC:MyHGroupCombo=new MyHGroupCombo(_myXML.e[i].@name);
-						_myScro._mysubG1.addElement(myC);
+						MyHGroupCombo(myC).label=_myXML.e[i].@name
+						_myScro._myForm.addElement(myC);
 					}else
 					{
-						var myE:MyHGroupLabel=new MyHGroupLabel(_myXML.e[i].@name,"111");
-						_myScro._mysubG1.addElement(myE);
+						var myE:IVisualElement
+						if(_layoutStyle==1)
+						{
+							myE=new MyHGroupLabel(_myXML.e[i].@name,"111");
+							MyHGroupLabel(myE).label=_myXML.e[i].@name;
+						}else
+						{
+							myE=new MyVGroupText(_myXML.e[i].@name,"111");
+						}
+						_myScro._myForm.addElement(myE);
 					}
 				}				
 			}			
@@ -60,17 +64,14 @@
 			{
 				_myXML=$xml;
 				
-			}			
+			}	
+			public function set layoutStyle($style:uint):void
+			{
+				_layoutStyle=$style;
+			}
 		]]>
 	</fx:Script>
 	<s:layout>
 		<s:VerticalLayout paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="10"/>
-	</s:layout>
-	<!--<s:Scroller id="scroller"				
-				width="100%" height="100%">		
-		<s:HGroup gap="200">
-			<s:VGroup id="v1" gap="20"/>			
-			<s:VGroup id="v2" gap="10"/>
-		</s:HGroup>		
-	</s:Scroller>	-->	
+	</s:layout>	
 </s:NavigatorContent>
