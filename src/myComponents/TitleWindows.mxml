@@ -35,7 +35,8 @@
 						
 					}else
 					{
-						var myS:SheetTab=new SheetTab();						
+						var myS:SheetTab=new SheetTab();
+						myS.myXML=_tempXml;
 						tn.addItem(myS);						
 						myS.label=GlobalValue._xmlData.tab[i].tabName;
 					}

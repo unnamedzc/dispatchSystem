@@ -15,12 +15,9 @@
 			
 			import myElements.DragImage;
 			import myElements.MyScroller;
-			
-			import spark.components.HGroup;
-			import spark.components.VGroup;
 			[Bindable]
 			private var _myXML:XML;
-			[Bindable]
+			
 			private var _layoutStyle:uint;
 			private function onAdd():void
 			{

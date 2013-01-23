@@ -1,8 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:NavigatorContent xmlns:fx="http://ns.adobe.com/mxml/2009" 
 					xmlns:s="library://ns.adobe.com/flex/spark" 
-					xmlns:mx="library://ns.adobe.com/flex/mx">
-	<fx:Declarations>
-		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
-	</fx:Declarations>
+					xmlns:mx="library://ns.adobe.com/flex/mx"  width="100%" height="100%" fontSize="20">
+	<fx:Script>
+		<![CDATA[
+			import com.jeff.myEvent.PassDataEvent;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.dataGridClasses.DataGridColumn;
+			import mx.controls.dataGridClasses.DataGridItemRenderer;
+			import mx.events.ListEvent;
+			import mx.events.ToolTipEvent;
+			
+			import spark.components.Scroller;
+			private var _myXML:XML;
+			private var _rowNum:uint;
+			//private var _rowVector:Vector.<MyGridRowGroup>=new Vector.<MyGridRowGroup>;
+			//private var _needDeleteRow:Vector.<uint>=new Vector.<uint>;
+			private var _columns:Array=new Array()
+			private var dataArr:ArrayCollection=new ArrayCollection();
+			private function assignScroll():void
+			{
+				/* var _myScro:MyScroller=new MyScroller();
+				_myScro.viewport=MainSheet;
+				//_myScro._isSheet=1;
+				this.addElement(_myScro); */
+				var _myScro:Scroller=new Scroller();
+				_myScro.viewport=MainSheet;
+				//_myScro._isSheet=1;
+				this.addElement(_myScro);
+				_myScro.percentWidth=110;
+				_myScro.percentHeight=100;
+			}
+			private function creatData():void
+			{				
+				_rowNum=_myXML.e.length();				
+				for(var i:uint;i<_rowNum;++i)
+				{
+					var GridName:DataGridColumn=new DataGridColumn();
+					GridName.headerText=_myXML.e[i].@name;
+//					GridName.dataField=_myXML.e[i].@name;
+//					GridName.dataTipField=_myXML.e[i].@name;
+					GridName.width=String(_myXML.e[i].@name).length*25;
+				
+					//GridName.headerRenderer="mx.controls.Label"
+					_columns.push(GridName);
+					
+				}
+				dg.columns=_columns
+					
+				
+			}
+					
+			public function set myXML(value:XML):void
+			{
+				_myXML = value;
+			}
+			private function addRow():void
+			{
+				var item:Object={};
+				dataArr.addItem(item);
+				dg.dataProvider=dataArr;				
+			}
+			private function refreshChooseVector(e:PassDataEvent):void
+			{
+				trace("refreshed:",e.type,e.obj);
+			}
+			private function removeRow():void
+			{
+				if(dg.selectedItem)
+				{
+					var item4:Object=dg.selectedItem;
+					var index:int=dataArr.getItemIndex(item4);
+					dataArr.removeItemAt(index);
+					dg.dataProvider=dataArr;
+				}
+			}
+			//			
+			
+			private function deleteToolTip(obj:Object):void {
+				//dg.toolTip = null;
+			}
+		]]>
+	</fx:Script>
+	<s:layout>
+		<s:VerticalLayout paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="10"/>
+	</s:layout>	
+	<s:VGroup>
+		<s:HGroup>
+			<s:Button label="添加数据行" click="addRow()"/>
+			<s:Button label="删除数据行 " click="removeRow()"/>
+		</s:HGroup>
+		<s:Group id="MainSheet" width="100%" height="100%" creationComplete="assignScroll()">
+			<mx:DataGrid id="dg" draggableColumns="false" fontSize="15" editable="true" creationComplete="creatData()" rowCount="10"/>
+		</s:Group>
+		
+		<!--<s:VGroup>
+			<mx:Grid  id="GridTitle" borderVisible="true" verticalGap="-2" horizontalGap="-2">
+				<mx:GridRow id="titleGrid" verticalCenter="0"/>					
+			</mx:Grid>
+			<s:Group id="MainSheet" width="100%" height="100%" creationComplete="assignScroll()">
+				<mx:Grid  id="Grid" borderVisible="true" verticalGap="-2" horizontalGap="-2"/>								
+			</s:Group>
+		</s:VGroup>-->
+		
+	</s:VGroup>
 </s:NavigatorContent>

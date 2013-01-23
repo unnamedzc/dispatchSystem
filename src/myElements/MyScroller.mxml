@@ -9,16 +9,19 @@
 		<![CDATA[	
 			import spark.components.Form;
 			import spark.components.HGroup;
-			import spark.components.VGroup;
-			//[Bindable]
+			import spark.components.VGroup;			
 			private var _mysubG1:VGroup=new VGroup();			
 			public	var _mysubG2:HGroup=new HGroup();
 			//for test
 			public var _myForm:Form=new Form();
 			private var _myG:HGroup=new HGroup();
-			
+			public var _isSheet:uint=0;
 			private function addToStage():void
 			{	
+				if(_isSheet)
+				{
+					return;
+				}
 				this.viewport=_myG;	
 				_myG.gap=100;
 				_mysubG1.gap=20;
