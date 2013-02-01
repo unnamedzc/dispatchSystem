@@ -9,5 +9,7 @@ package Values
 		public static var _xmlData:XML;
 		public static var _stageWidth:uint;
 		public static var _stageHeight:uint;
+		
+		public static var _dataXml:XML=new XML();
 	}
 }

@@ -8,10 +8,9 @@ package com.jeff.dataView.dataElement
 	
 	public class MyHGroupLabel extends FormItem
 	{
+		private var label2:IVisualElement
 		public function MyHGroupLabel($text1:String="",$text2:String="",$editable:Boolean=true)
 		{
-			
-			var label2:IVisualElement
 			if(!$editable)
 			{
 				label2=new Label();
@@ -23,6 +22,14 @@ package com.jeff.dataView.dataElement
 			//this.label=$text1
 			addElement(label2);
 			super();
+		}
+		public function getTitle():String
+		{
+			return this.label;
+		}
+		public function getText():String
+		{
+			return TextInput(label2).text;
 		}
 	}
 }

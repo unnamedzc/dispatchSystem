@@ -50,6 +50,14 @@
 			{
 				//startImage.source = (fileList.selectedItem as File).nativePath;
 			}
+			public function getTitle():String
+			{
+				return title
+			}
+			public function getURL():String
+			{
+				return "url"
+			}
 			
 		]]>
 	</fx:Script>

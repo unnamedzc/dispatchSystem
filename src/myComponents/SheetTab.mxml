@@ -2,29 +2,44 @@
 <s:NavigatorContent xmlns:fx="http://ns.adobe.com/mxml/2009" 
 					xmlns:s="library://ns.adobe.com/flex/spark" 
 					xmlns:mx="library://ns.adobe.com/flex/mx"  width="100%" height="100%" fontSize="20">
+	<!--<fx:Declarations>
+		<fx:Component id="myDF">
+			<s:HGroup>
+				<fx:Script>
+					<![CDATA[
+						
+					]]>
+				</fx:Script>
+				<mx:DateField id="dateField1" yearNavigationEnabled="true"
+							 color="0x000000"/>
+			</s:HGroup>
+		</fx:Component>
+	</fx:Declarations>-->	
 	<fx:Script>
-		<![CDATA[
-			import com.jeff.myEvent.PassDataEvent;
+		<![CDATA[		
+			import com.jeff.myFactory.MyFactory;
 			
 			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.controls.DateField;
 			import mx.controls.dataGridClasses.DataGridColumn;
 			import mx.controls.dataGridClasses.DataGridItemRenderer;
 			import mx.events.ListEvent;
 			import mx.events.ToolTipEvent;
 			
 			import spark.components.Scroller;
+			//for component;
 			private var _myXML:XML;
+			
 			private var _rowNum:uint;
-			//private var _rowVector:Vector.<MyGridRowGroup>=new Vector.<MyGridRowGroup>;
-			//private var _needDeleteRow:Vector.<uint>=new Vector.<uint>;
+			//for data
+			public var _tabData:XML=<tab></tab>;
+			
 			private var _columns:Array=new Array()
 			private var dataArr:ArrayCollection=new ArrayCollection();
+			private var _tempStr:String;
 			private function assignScroll():void
 			{
-				/* var _myScro:MyScroller=new MyScroller();
-				_myScro.viewport=MainSheet;
-				//_myScro._isSheet=1;
-				this.addElement(_myScro); */
 				var _myScro:Scroller=new Scroller();
 				_myScro.viewport=MainSheet;
 				//_myScro._isSheet=1;
@@ -39,33 +54,80 @@
 				{
 					var GridName:DataGridColumn=new DataGridColumn();
 					GridName.headerText=_myXML.e[i].@name;
-//					GridName.dataField=_myXML.e[i].@name;
-//					GridName.dataTipField=_myXML.e[i].@name;
-					GridName.width=String(_myXML.e[i].@name).length*25;
-				
-					//GridName.headerRenderer="mx.controls.Label"
+					
+					GridName.dataField=i.toString();
+				 	 if(_myXML.e[i].@name=="时间")
+					{
+						var myDateField:ClassFactory = new ClassFactory(DateField);
+						//var myDateField:MyFactory=new MyFactory(createDateField);
+						//ClassFactory(myDateField).properties={dataProvider:mydata}
+						//myDateField.properties={ dataProvider:}
+						//GridName.itemEditor=myDateField//myDateField;
+						//GridName.itemRenderer=mx.controls.DateField;
+						GridName.itemRenderer=myDateField
+						GridName.rendererIsEditor=true;
+						GridName.editorDataField="selectedDate";
+						GridName.width=String(_myXML.e[i].@name).length*60;
+					}else
+					{
+						GridName.width=String(_myXML.e[i].@name).length*30;
+					}
 					_columns.push(GridName);
-					
 				}
-				dg.columns=_columns
-					
-				
+				dg.columns=_columns;				
 			}
-					
+			/*  private function createDateField():DateField
+			{
+				var dateF:DateField=new DateField();
+				dateF.addEventListener(Event.CHANGE,oC);
+				return dateF
+			}
+			private function oC(e:Event):void
+			{
+				//mydata.push(String(DateField(e.target).selectedDate))
+				//var date:Date=DateField(e.target).selectedDate
+				//_tempStr=date.getFullYear().toString() + 
+					//'/' + (date.getMonth()+1).toString() + '/' + date.getDate();
+			}  */
+			public function get value():Object
+			{				
+				return _tempStr;
+			}
 			public function set myXML(value:XML):void
 			{
 				_myXML = value;
 			}
 			private function addRow():void
 			{
+				var _len:uint=dataArr.length;
+				
+				if(_len>0)
+				{
+					var _prevLen:uint;
+					for(var i:uint;i<_rowNum;++i)
+					{
+					//	trace(dataArr[_len-1][i.toString()])
+						if(dataArr[_len-1][i.toString()]==undefined)
+						{
+							_prevLen++;
+						}
+					}
+					if(_prevLen==_rowNum)
+					{
+						Alert.buttonHeight=30;						
+						Alert.show('请在最新添加的数据行中至少填写一项数据!', '无法添加新数据');
+						
+						return;
+					}
+				}
+				/* if(dataArr[_len].length==0)
+				{
+					trace("lastLine is null")
+				} */
 				var item:Object={};
 				dataArr.addItem(item);
 				dg.dataProvider=dataArr;				
-			}
-			private function refreshChooseVector(e:PassDataEvent):void
-			{
-				trace("refreshed:",e.type,e.obj);
-			}
+			}		
 			private function removeRow():void
 			{
 				if(dg.selectedItem)
@@ -77,32 +139,41 @@
 				}
 			}
 			//			
-			
-			private function deleteToolTip(obj:Object):void {
-				//dg.toolTip = null;
+			private function show():void
+			{
+				var _len:uint=dataArr.length
+				//trace(dataArr,dataArr.length);
+					//todo combine xml
+				var _tab:String;
+				var _info:String;
+				for(var i:uint;i<_len;++i)
+				{
+					for(var j:uint;j<_rowNum;++j)
+					{
+						//trace(dataArr[i][j.toString()]);
+						_tab=_myXML.e[i].@name;
+						_info=	dataArr[i][j.toString()];
+						_tabData.appendChild(<{_tab}>{_info}</{_tab}>)
+					}
+				}
+				trace(_tabData);
 			}
+			
 		]]>
 	</fx:Script>
 	<s:layout>
 		<s:VerticalLayout paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="10"/>
 	</s:layout>	
+	
 	<s:VGroup>
 		<s:HGroup>
 			<s:Button label="添加数据行" click="addRow()"/>
 			<s:Button label="删除数据行 " click="removeRow()"/>
+			<s:Button label="test" click="show()"/>
 		</s:HGroup>
 		<s:Group id="MainSheet" width="100%" height="100%" creationComplete="assignScroll()">
-			<mx:DataGrid id="dg" draggableColumns="false" fontSize="15" editable="true" creationComplete="creatData()" rowCount="10"/>
-		</s:Group>
-		
-		<!--<s:VGroup>
-			<mx:Grid  id="GridTitle" borderVisible="true" verticalGap="-2" horizontalGap="-2">
-				<mx:GridRow id="titleGrid" verticalCenter="0"/>					
-			</mx:Grid>
-			<s:Group id="MainSheet" width="100%" height="100%" creationComplete="assignScroll()">
-				<mx:Grid  id="Grid" borderVisible="true" verticalGap="-2" horizontalGap="-2"/>								
-			</s:Group>
-		</s:VGroup>-->
-		
+			<mx:DataGrid id="dg" draggableColumns="false" fontSize="15" editable="true" creationComplete="creatData()"/>
+				
+		</s:Group>	
 	</s:VGroup>
 </s:NavigatorContent>

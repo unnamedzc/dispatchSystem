@@ -15,31 +15,38 @@
 			
 			import myElements.DragImage;
 			import myElements.MyScroller;
-			[Bindable]
+			
 			private var _myXML:XML;
 			
+			public var _tabData:XML=<tab></tab>;
 			private var _layoutStyle:uint;
+			private var _myScro:MyScroller=new MyScroller();
+			//pool
+			public var _eleVec:Vector.<IVisualElement>=new Vector.<IVisualElement>();
 			private function onAdd():void
 			{
 				//trace(scroller)
 			}
 			private function initForm():void
 			{		
-				var _myScro:MyScroller=new MyScroller();
+				//var _myScro:MyScroller=new MyScroller();
 				this.addElement(_myScro);		
 				//_myScro._mysubG1.horizontalAlign="center";
 				var	_len:uint=_myXML.e.length();
-				
+				//todo
+				//modify _tabData
 				for(var i:uint=0;i<_len;++i)
 				{				
 					if(_myXML.e[i].@isUrl=="1"){
-						var myI:DragImage=new DragImage()
+						var myI:DragImage=new DragImage();
+						_eleVec.push(myI);
 						myI.title=_myXML.e[i].@name;
 						_myScro._mysubG2.addElement(myI);
 						
 					}
 					else if(_myXML.e[i].@isComBox=="1"){
 						var myC:MyHGroupCombo=new MyHGroupCombo(_myXML.e[i].@name);
+						_eleVec.push(myC);
 						MyHGroupCombo(myC).label=_myXML.e[i].@name
 						_myScro._myForm.addElement(myC);
 					}else
@@ -53,6 +60,7 @@
 						{
 							myE=new MyVGroupText(_myXML.e[i].@name,"111");
 						}
+						_eleVec.push(myE);
 						_myScro._myForm.addElement(myE);
 					}
 				}				
@@ -65,6 +73,42 @@
 			public function set layoutStyle($style:uint):void
 			{
 				_layoutStyle=$style;
+			}
+			public function setData():void
+			{
+				//_tabData
+				var	_len:uint=_myXML.e.length();
+				var _tab:String;
+				var _info:String;
+				for(var i:uint;i<_len;++i)
+				{
+//					trace(_myScro._myForm.getChildAt(i))
+					if(_eleVec[i] is MyHGroupLabel)
+					{
+						_tab=MyHGroupLabel(_eleVec[i]).getTitle()
+						_info=MyHGroupLabel(_eleVec[i]).getText()
+						
+
+						//trace(MyHGroupLabel(_eleVec[i]).getTitle(),MyHGroupLabel(_eleVec[i]).getText())
+					}else if(_eleVec[i] is MyHGroupCombo)
+					{
+						_tab=MyHGroupCombo(_eleVec[i]).getTitle()
+						_info=MyHGroupCombo(_eleVec[i]).getText()
+						//trace(MyHGroupCombo(_eleVec[i]).getText())
+					}else if(_eleVec[i] is MyVGroupText)
+					{
+						_tab=MyVGroupText(_eleVec[i]).getTitle()
+						_info=MyVGroupText(_eleVec[i]).getText()
+						//trace(MyVGroupText(_eleVec[i]).getText())
+					}else if(_eleVec[i] is DragImage)
+					{
+						_tab=DragImage(_eleVec[i]).getTitle()
+						_info=DragImage(_eleVec[i]).getURL()
+						//trace(DragImage(_eleVec[i]).getTitle(),DragImage(_eleVec[i]).getURL())
+					}
+					_tabData.appendChild(<{_tab}>{_info}</{_tab}>)
+				}
+				//trace(_tabData)
 			}
 		]]>
 	</fx:Script>

@@ -9,11 +9,27 @@
 		<![CDATA[
 			import Values.GlobalValue;
 			
+			import mx.core.IVisualElementContainer;
 			import mx.events.ResizeEvent;
 			import mx.managers.PopUpManager;
 			
 			import spark.components.NavigatorContent;		
-			
+			public var _editable:Boolean=false;
+			private var _tabVec:Vector.<IVisualElementContainer>=new Vector.<IVisualElementContainer>();
+			private function addData():void
+			{
+				//tn.getChildAt(0).setData();
+				trace("all tab here is:",_tabVec);
+				for(var i:uint;i<_tabVec.length;++i)
+				{
+					if(_tabVec[i] is TableTab)
+					{
+						TableTab(_tabVec[i]).setData();
+					}
+				}
+				
+				
+			}
 			private function onAdd():void
 			{
 				trace("titleWin ")				
@@ -28,6 +44,7 @@
 					if(uint(GlobalValue._xmlData.tab[i].@isTable)!=0)
 					{
 						var myT:TableTab=new TableTab();
+						_tabVec.push(myT);
 						myT.myXML=_tempXml;
 						myT.layoutStyle=uint(GlobalValue._xmlData.tab[i].@isTable)
 						tn.addElement(myT);	
@@ -36,6 +53,7 @@
 					}else
 					{
 						var myS:SheetTab=new SheetTab();
+						_tabVec.push(myS);
 						myS.myXML=_tempXml;
 						tn.addItem(myS);						
 						myS.label=GlobalValue._xmlData.tab[i].tabName;
@@ -53,7 +71,7 @@
 	</s:layout>
 	<s:VGroup width="100%" height="100%">
 		<s:HGroup>			
-			<s:Button label="确定"/>
+			<s:Button label="确定" click="addData();PopUpManager.removePopUp(this);System.gc()"/>
 			<s:Button label="取消" click="PopUpManager.removePopUp(this);System.gc()"/>
 		</s:HGroup>
 		<mx:TabNavigator id="tn" height="100%" width="100%" color="0x323232"/>

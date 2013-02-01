@@ -15,10 +15,10 @@ package com.jeff.dataView.dataElement
 	
 	public class MyVGroupText extends VGroup
 	{
+		private var label2:IVisualElement;
+		private var label1:Label=new Label();
 		public function MyVGroupText($text1:String="",$text2:String="",$editable:Boolean=true)
-		{
-			var label1:Label=new Label();
-			var label2:IVisualElement
+		{						
 			if(!$editable)
 			{
 				label2=new TextArea();
@@ -35,6 +35,14 @@ package com.jeff.dataView.dataElement
 			addElement(label2);
 			
 			super();
+		}
+		public function getTitle():String
+		{
+			return label1.text;
+		}
+		public function getText():String
+		{
+			return TextArea(label2).text;
 		}
 	}
 }
