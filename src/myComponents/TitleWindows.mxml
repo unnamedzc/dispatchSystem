@@ -9,60 +9,110 @@
 		<![CDATA[
 			import Values.GlobalValue;
 			
+			import com.jeff.dataControler.DataManager;
+			import com.jeff.myEvent.XMLEvent;
+			
 			import mx.core.IVisualElementContainer;
-			import mx.events.ResizeEvent;
 			import mx.managers.PopUpManager;
 			
-			import spark.components.NavigatorContent;		
-			public var _editable:Boolean=false;
+			//public var _ID:uint;
+			public var _editMode:uint;//0:增加数据，1：修改数据，2：查看数据
+			private var _tempDataXML:XML;
+			//private var _editedData:XML=<emp></emp>
+			
 			private var _tabVec:Vector.<IVisualElementContainer>=new Vector.<IVisualElementContainer>();
-			private function addData():void
+			/*
+			按确定键后，增加数据或者确定修改的数据。
+			
+			*/
+			private function changeData():void
 			{
 				//tn.getChildAt(0).setData();
-				trace("all tab here is:",_tabVec);
-				for(var i:uint;i<_tabVec.length;++i)
+				//trace("all tab here is:",_tabVec);
+				//bug here add then edit and add
+				if(_editMode==0)//add
 				{
-					if(_tabVec[i] is TableTab)
+					DataManager.getInstance()._empData.@id=GlobalValue._empId++;
+					for(var i:uint;i<_tabVec.length;++i)
 					{
-						TableTab(_tabVec[i]).setData();
-					}
+						if(_tabVec[i] is TableTab)
+						{
+							TableTab(_tabVec[i]).setData();
+							DataManager.getInstance().combineData(TableTab(_tabVec[i])._tabData);
+						}
+						else if(_tabVec[i] is SheetTab)
+						{
+							SheetTab(_tabVec[i]).setData();				
+							DataManager.getInstance().combineData(SheetTab(_tabVec[i])._tabData);
+						}
+					}				
+					DataManager.getInstance()._wholeData.appendChild(DataManager.getInstance()._empData);
+					DataManager.getInstance().resetEmpXML();
+					//trace("in TitleWin:",DataManager.getInstance()._wholeData);
+					this.dispatchEvent(new XMLEvent(XMLEvent.DATA_COMBINED))
+				}else{
+					//edit mode
+					trace("_editMode is:",_editMode)
 				}
-				
-				
 			}
 			private function onAdd():void
 			{
-				trace("titleWin ")				
+				//trace("titleWin: editable: ",_editable)				
 			}
 			private function onCreated():void
 			{
+				if(_editMode>0){
+					//窗口为可编辑
+					_tempDataXML=new XML();
+					//test Data todo to check which line has been choosen;
+					trace(XML(DataManager.getInstance()._wholeData));
+					_tempDataXML=XML(DataManager.getInstance()._wholeData.emp.(@id==GlobalValue._selectedMainSheetID));
+					//trace("TitleWin created:",_tempDataXML);
+				}			
+				//creat the xml according to the assigned XML not data
 				var _len:uint=GlobalValue._xmlData.tab.length();
 				var _tempXml:XML;
+				//一个标签，tab标签数量
+				var _tabNum:uint=0;
 				for(var i:uint;i<_len;++i)
 				{					
 					_tempXml=XML(GlobalValue._xmlData.tab[i].elements);	
 					if(uint(GlobalValue._xmlData.tab[i].@isTable)!=0)
 					{
+						//输入框形式
 						var myT:TableTab=new TableTab();
+						myT._tabID=i;
 						_tabVec.push(myT);
 						myT.myXML=_tempXml;
-						myT.layoutStyle=uint(GlobalValue._xmlData.tab[i].@isTable)
+						myT.layoutStyle=uint(GlobalValue._xmlData.tab[i].@isTable);
 						tn.addElement(myT);	
 						myT.label=GlobalValue._xmlData.tab[i].tabName;
-						
+						if(_editMode>0){
+							if(i==0){
+								myT.setDataProvide(XML(_tempDataXML.mainTab));
+							}else
+							{
+								//trace("i is:",i,XML(_tempDataXML.tab[i-1]));
+								myT.setDataProvide(XML(_tempDataXML.tab[i-1]));
+							}
+						}
 					}else
 					{
+						//列表形式
 						var myS:SheetTab=new SheetTab();
 						_tabVec.push(myS);
 						myS.myXML=_tempXml;
-						tn.addItem(myS);						
+						tn.addItem(myS);
+						if(_editMode>0){
+							myS.setDataProvide(XML(_tempDataXML.tab[i-1]));
+						}
 						myS.label=GlobalValue._xmlData.tab[i].tabName;
 					}
-				}  
+				}				
 			}
 			private function onChangeTab(e:Event):void
 			{
-				trace("changeTab:",e.target.name)
+				trace("changeTab:",e.target.name);
 			}
 		]]>
 	</fx:Script>
@@ -71,7 +121,7 @@
 	</s:layout>
 	<s:VGroup width="100%" height="100%">
 		<s:HGroup>			
-			<s:Button label="确定" click="addData();PopUpManager.removePopUp(this);System.gc()"/>
+			<s:Button label="确定" click="changeData();PopUpManager.removePopUp(this);System.gc()"/>
 			<s:Button label="取消" click="PopUpManager.removePopUp(this);System.gc()"/>
 		</s:HGroup>
 		<mx:TabNavigator id="tn" height="100%" width="100%" color="0x323232"/>

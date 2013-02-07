@@ -1,5 +1,6 @@
 package Values
 {
+	
 	import spark.components.Scroller;
 
 	public class GlobalValue
@@ -9,7 +10,13 @@ package Values
 		public static var _xmlData:XML;
 		public static var _stageWidth:uint;
 		public static var _stageHeight:uint;
+		public static var _editMode:String//edit,add,remove	
 		
-		public static var _dataXml:XML=new XML();
+		//selected
+		public static var _selectedMainSheetID:uint;
+		
+		//正在编辑的驾驶员id
+		public static var _empId:uint;
+		
 	}
 }

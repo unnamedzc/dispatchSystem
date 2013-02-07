@@ -17,15 +17,11 @@
 	</fx:Declarations>-->	
 	<fx:Script>
 		<![CDATA[		
-			import com.jeff.myFactory.MyFactory;
-			
 			import mx.collections.ArrayCollection;
 			import mx.controls.Alert;
-			import mx.controls.DateField;
 			import mx.controls.dataGridClasses.DataGridColumn;
-			import mx.controls.dataGridClasses.DataGridItemRenderer;
-			import mx.events.ListEvent;
-			import mx.events.ToolTipEvent;
+			
+			import myElements.MyDateField;
 			
 			import spark.components.Scroller;
 			//for component;
@@ -34,10 +30,14 @@
 			private var _rowNum:uint;
 			//for data
 			public var _tabData:XML=<tab></tab>;
-			
+			private var _rowData:XML;
+			private var _testXML:XML;
 			private var _columns:Array=new Array()
 			private var dataArr:ArrayCollection=new ArrayCollection();
 			private var _tempStr:String;
+			//[Bindable]
+			//public var ac:ArrayCollection = new ArrayCollection(
+				//[{dateString:"11/12/2006", contact:"ABD DEF", dt: new Date(2004,11,2)}])
 			private function assignScroll():void
 			{
 				var _myScro:Scroller=new Scroller();
@@ -48,47 +48,74 @@
 				_myScro.percentHeight=100;
 			}
 			private function creatData():void
-			{				
+			{	
+				//initData
+				//test
+				//dg.editable=false;
+				//for data
+				var _testStr:String;
 				_rowNum=_myXML.e.length();				
 				for(var i:uint;i<_rowNum;++i)
-				{
+				{					
 					var GridName:DataGridColumn=new DataGridColumn();
 					GridName.headerText=_myXML.e[i].@name;
 					
 					GridName.dataField=i.toString();
-				 	 if(_myXML.e[i].@name=="时间")
+				 	  if(_myXML.e[i].@name=="时间")
 					{
-						var myDateField:ClassFactory = new ClassFactory(DateField);
-						//var myDateField:MyFactory=new MyFactory(createDateField);
-						//ClassFactory(myDateField).properties={dataProvider:mydata}
-						//myDateField.properties={ dataProvider:}
-						//GridName.itemEditor=myDateField//myDateField;
-						//GridName.itemRenderer=mx.controls.DateField;
-						GridName.itemRenderer=myDateField
+						
+						var myDateField:ClassFactory = new ClassFactory(MyDateField);							
+						GridName.itemRenderer=myDateField;						
+						//GridName.dataField="dataField";
 						GridName.rendererIsEditor=true;
 						GridName.editorDataField="selectedDate";
 						GridName.width=String(_myXML.e[i].@name).length*60;
 					}else
-					{
+					{ 
 						GridName.width=String(_myXML.e[i].@name).length*30;
 					}
 					_columns.push(GridName);
 				}
-				dg.columns=_columns;				
+				dg.columns=_columns;
+				//
+				
+				//get data
+				if(_testXML!=null){
+					//_testStr=_testXML.elements("*")[i]
+					
+					var line:uint=_testXML.rowData.length();
+					for(i=0;i<line;i++)
+					{
+						//trace("data:",_testXML.rowData[i].elements("*")[0])
+						var _tempObj:Object={};
+						var rowLen:uint=_testXML.rowData[i].length;
+						for(var j:uint=0;j<_rowNum;++j)
+						{
+							_testStr=_testXML.rowData[i].elements("*")[j]
+							if(j==0){
+								//将xml中的string型装换为date
+								_tempObj[j.toString()]=new Date(Date.parse(_testStr));
+							}else
+							{								
+								if(_testStr!=""){
+									_tempObj[j.toString()]=_testStr;
+								}else
+								{
+									_tempObj[j.toString()]="";
+								}
+								
+							}
+						}
+						dataArr.addItem(_tempObj);
+					}
+					//trace("/n\n",dataArr.length);
+					//trace("testXML in SheetTab:",_testXML.rowData.length());
+				}
+				
+				//==============dataProvider todo set date in dg
+				dg.dataProvider=dataArr;
 			}
-			/*  private function createDateField():DateField
-			{
-				var dateF:DateField=new DateField();
-				dateF.addEventListener(Event.CHANGE,oC);
-				return dateF
-			}
-			private function oC(e:Event):void
-			{
-				//mydata.push(String(DateField(e.target).selectedDate))
-				//var date:Date=DateField(e.target).selectedDate
-				//_tempStr=date.getFullYear().toString() + 
-					//'/' + (date.getMonth()+1).toString() + '/' + date.getDate();
-			}  */
+			
 			public function get value():Object
 			{				
 				return _tempStr;
@@ -97,6 +124,8 @@
 			{
 				_myXML = value;
 			}
+			
+			//增加一行空数据
 			private function addRow():void
 			{
 				var _len:uint=dataArr.length;
@@ -120,14 +149,12 @@
 						return;
 					}
 				}
-				/* if(dataArr[_len].length==0)
-				{
-					trace("lastLine is null")
-				} */
+			
 				var item:Object={};
 				dataArr.addItem(item);
 				dg.dataProvider=dataArr;				
-			}		
+			}	
+			//删除一行数据
 			private function removeRow():void
 			{
 				if(dg.selectedItem)
@@ -139,26 +166,45 @@
 				}
 			}
 			//			
-			private function show():void
+			private function showSheetXML():void
 			{
 				var _len:uint=dataArr.length
-				//trace(dataArr,dataArr.length);
+			//	trace(dataArr,dataArr.length);
 					//todo combine xml
 				var _tab:String;
 				var _info:String;
 				for(var i:uint;i<_len;++i)
 				{
-					for(var j:uint;j<_rowNum;++j)
+					_rowData=<rowData></rowData>;
+					for(var j:uint=0;j<_rowNum;++j)
 					{
-						//trace(dataArr[i][j.toString()]);
-						_tab=_myXML.e[i].@name;
-						_info=	dataArr[i][j.toString()];
-						_tabData.appendChild(<{_tab}>{_info}</{_tab}>)
+						trace(dataArr[i][j.toString()]);
+						_tab=_myXML.e[j].@name;
+						if(dataArr[i][j.toString()]!=undefined)
+						{
+							_info=	dataArr[i][j.toString()];
+						}else
+						{
+							_info="";
+						}
+						_rowData.appendChild(<{_tab}>{_info}</{_tab}>)
 					}
+					_tabData.appendChild(_rowData);
 				}
-				trace(_tabData);
+				trace(_rowData)
+				//trace(dataArr);
 			}
 			
+			public function setData():void
+			{
+				showSheetXML();				
+			}
+			
+			public function setDataProvide($data:XML=null):void
+			{
+				_testXML=XML($data);
+				//trace("sheetData:",$data)
+			}
 		]]>
 	</fx:Script>
 	<s:layout>
@@ -169,7 +215,7 @@
 		<s:HGroup>
 			<s:Button label="添加数据行" click="addRow()"/>
 			<s:Button label="删除数据行 " click="removeRow()"/>
-			<s:Button label="test" click="show()"/>
+			<s:Button label="test" click="showSheetXML()"/>
 		</s:HGroup>
 		<s:Group id="MainSheet" width="100%" height="100%" creationComplete="assignScroll()">
 			<mx:DataGrid id="dg" draggableColumns="false" fontSize="15" editable="true" creationComplete="creatData()"/>

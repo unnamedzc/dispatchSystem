@@ -44,5 +44,9 @@ package com.jeff.dataView.dataElement
 		{
 			return TextArea(label2).text;
 		}
+		public function setText($tex:String):void
+		{
+			TextArea(label2).text=$tex;
+		}
 	}
 }

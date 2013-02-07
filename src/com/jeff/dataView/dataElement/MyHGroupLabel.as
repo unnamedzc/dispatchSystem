@@ -31,5 +31,10 @@ package com.jeff.dataView.dataElement
 		{
 			return TextInput(label2).text;
 		}
+		
+		public function setText($tex:String):void
+		{
+			TextInput(label2).text=$tex;
+		}
 	}
 }

@@ -3,7 +3,7 @@
 <s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
 					   xmlns:s="library://ns.adobe.com/flex/spark"
 					   xmlns:mx="library://ns.adobe.com/flex/mx"
-					   xmlns:MyComponent="com.jeff.MyComponent.*" fontSize="20"  title="个体驾驶员信息系统" initialize="getData()" creationComplete="assignData()" resize="onResize()" xmlns:myComponents="myComponents.*">
+					   xmlns:MyComponent="com.jeff.MyComponent.*" fontSize="20"  title="个体驾驶员信息系统v0.9" initialize="getData()" creationComplete="assignData()" resize="onResize()" xmlns:myComponents="myComponents.*">
 	
 	<fx:Style>
 		@namespace "library://ns.adobe.com/flex/spark";
@@ -24,23 +24,20 @@
 			fontSize: 20;
 		}  */
 	</fx:Style>
+	<!--DataManager 掌管所有data数据-->
 	<fx:Script>
 		<![CDATA[			
 			import Values.GlobalValue;
 			
 			import com.jeff.dataControler.DataManager;
+			import com.jeff.myEvent.XMLEvent;
 			
 			import mx.core.IFlexDisplayObject;
-			import mx.core.IVisualElement;
-			import mx.core.IVisualElementContainer;
-			import mx.events.ResizeEvent;
 			import mx.managers.PopUpManager;
 			
 			import myComponents.TitleWindows;
-			//private var _xmlData:XML=new XML;
 			private var addTileWin:TitleWindows;
-			//the whole data that will be saved to file;
-			private var wholeData:XML=<data></data>
+			
 			public function getData():void
 			{
 				var request:URLRequest = new URLRequest("/data/tableList.xml");  
@@ -48,32 +45,42 @@
 				loader.addEventListener(Event.COMPLETE, loaderCompleteHandler); 
 			
 				maximize();
+				_resizeAllComponent()
 				showStatusBar=false;
 				DataManager.getInstance().saveData();
 			}
+			
 			private function loaderCompleteHandler(event:Event):void
 			{
 				GlobalValue._xmlData=XML(event.target.data);					
 			}
+			
 			public function assignData():void
-			{
-				
+			{		
 				
 			}
+			
 			private function onResize():void
 			{						
 				_resizeAllComponent()
 			}
+			
 			//弹出添加窗口
-			private function addTitleWin():void
+			private function addTitleWin($mode:uint=0):void
 			{		
-				//应该设为全局
+				//$mode=0:add 1:edit 2:check
+				//应该设为全局				
 				addTileWin=TitleWindows(PopUpManager.createPopUp(this, TitleWindows,true));
-				addTileWin.addEventListener("close", closeHandler);				
+				
+				addTileWin._editMode=$mode;
+			
+				addTileWin.addEventListener("close", closeHandler);	
+				addTileWin.addEventListener(XMLEvent.DATA_COMBINED,_refreshMainTable)
 				addTileWin.x=20;
 				addTileWin.y=20;
 				_resizeAllComponent()
 			}
+			
 			private function _resizeAllComponent():void
 			{
 				if(addTileWin)
@@ -82,15 +89,32 @@
 					addTileWin.height=this.height-40;
 				}
 			}
+			//关闭弹出窗口
 			private function closeHandler(event:Event):void {
 				event.target.removeEventListener("close", closeHandler);
+				addTileWin.removeEventListener(XMLEvent.DATA_COMBINED,_refreshMainTable)
 				PopUpManager.removePopUp(event.target as IFlexDisplayObject);
 				System.gc();
 			}
+			
+			private function deleteRow():void
+			{				
+				var _selectedId:uint=mainTable.selectedIndex
+					
+				if(_selectedId<0)
+				{
+					return;
+				}
+				trace("delete:",mainTable.selectedIndex);
+				delete DataManager.getInstance()._wholeData.emp[_selectedId];
+				_refreshMainTable()
+				trace( DataManager.getInstance()._wholeData)
+			}
+			
 			//create whole data
-			private function createWholeData():void
-			{
-				
+			private function _refreshMainTable(e:XMLEvent=null):void
+			{				
+				mainTable.dataProvider= DataManager.getInstance()._wholeData.emp.mainTab;					
 			}
 		]]>
 	</fx:Script>
@@ -123,8 +147,8 @@
 			<s:VGroup width="65%" height="100%">
 				<s:HGroup>
 					<s:Button label="添加" click="addTitleWin()"/>
-					<s:Button label="删除"/>
-					<s:Button label="修改"/>
+					<s:Button label="删除" click="deleteRow()"/>
+					<s:Button label="修改" click="addTitleWin(1)"/>
 				</s:HGroup>
 				<myComponents:MainSheet id="mainTable" width="100%" height="100%"/>
 			</s:VGroup>				

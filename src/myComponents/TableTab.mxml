@@ -19,36 +19,46 @@
 			private var _myXML:XML;
 			
 			public var _tabData:XML=<tab></tab>;
+			private var _testXML:XML;
+			//public var _mainTab:XML=<mainTab></mainTab>;
+			public var _tabID:uint;
 			private var _layoutStyle:uint;
 			private var _myScro:MyScroller=new MyScroller();
 			//pool
 			public var _eleVec:Vector.<IVisualElement>=new Vector.<IVisualElement>();
 			private function onAdd():void
 			{
-				//trace(scroller)
+				//trace(scroller);
 			}
+			
 			private function initForm():void
 			{		
-				//var _myScro:MyScroller=new MyScroller();
-				this.addElement(_myScro);		
-				//_myScro._mysubG1.horizontalAlign="center";
+				//initData
+				this.addElement(_myScro);	
 				var	_len:uint=_myXML.e.length();
-				//todo
+
+				//for data
+				var _testStr:String;
+				
 				//modify _tabData
 				for(var i:uint=0;i<_len;++i)
-				{				
+				{		
+					if(_testXML!=null)
+						_testStr=_testXML.elements("*")[i]
+						//trace("testXML in TableTab:",_testXML,_testStr=_testXML.elements("*")[i]);
 					if(_myXML.e[i].@isUrl=="1"){
 						var myI:DragImage=new DragImage();
 						_eleVec.push(myI);
 						myI.title=_myXML.e[i].@name;
 						_myScro._mysubG2.addElement(myI);
-						
+						myI.setText(_testStr);						
 					}
 					else if(_myXML.e[i].@isComBox=="1"){
 						var myC:MyHGroupCombo=new MyHGroupCombo(_myXML.e[i].@name);
 						_eleVec.push(myC);
 						MyHGroupCombo(myC).label=_myXML.e[i].@name
-						_myScro._myForm.addElement(myC);
+						_myScro._myForm.addElement(myC);						
+						myC.setText(_testStr);
 					}else
 					{
 						var myE:IVisualElement
@@ -56,60 +66,75 @@
 						{
 							myE=new MyHGroupLabel(_myXML.e[i].@name,"111");
 							MyHGroupLabel(myE).label=_myXML.e[i].@name;
+							MyHGroupLabel(myE).setText(_testStr);
 						}else
 						{
 							myE=new MyVGroupText(_myXML.e[i].@name,"111");
+							MyVGroupText(myE).setText(_testStr);
 						}
-						_eleVec.push(myE);
+						_eleVec.push(myE);						
 						_myScro._myForm.addElement(myE);
 					}
 				}				
-			}			
+			}
+			
+			//not for data
 			public function set myXML($xml:XML):void
 			{
 				_myXML=$xml;
 				
-			}	
+			}
+			
 			public function set layoutStyle($style:uint):void
 			{
 				_layoutStyle=$style;
 			}
+			
+			//after click "确定按钮牛"
 			public function setData():void
 			{
 				//_tabData
 				var	_len:uint=_myXML.e.length();
 				var _tab:String;
 				var _info:String;
+				if(_tabID==0){
+					_tabData=<mainTab></mainTab>
+					//_tabData.appendChild(<{_tab}>{_info}</{_tab}>)
+				}
 				for(var i:uint;i<_len;++i)
 				{
 //					trace(_myScro._myForm.getChildAt(i))
 					if(_eleVec[i] is MyHGroupLabel)
 					{
-						_tab=MyHGroupLabel(_eleVec[i]).getTitle()
-						_info=MyHGroupLabel(_eleVec[i]).getText()
-						
-
+						_tab=MyHGroupLabel(_eleVec[i]).getTitle();
+						_info=MyHGroupLabel(_eleVec[i]).getText();
 						//trace(MyHGroupLabel(_eleVec[i]).getTitle(),MyHGroupLabel(_eleVec[i]).getText())
 					}else if(_eleVec[i] is MyHGroupCombo)
 					{
-						_tab=MyHGroupCombo(_eleVec[i]).getTitle()
-						_info=MyHGroupCombo(_eleVec[i]).getText()
+						_tab=MyHGroupCombo(_eleVec[i]).getTitle();
+						_info=MyHGroupCombo(_eleVec[i]).getText();
 						//trace(MyHGroupCombo(_eleVec[i]).getText())
 					}else if(_eleVec[i] is MyVGroupText)
 					{
-						_tab=MyVGroupText(_eleVec[i]).getTitle()
-						_info=MyVGroupText(_eleVec[i]).getText()
+						_tab=MyVGroupText(_eleVec[i]).getTitle();
+						_info=MyVGroupText(_eleVec[i]).getText();
 						//trace(MyVGroupText(_eleVec[i]).getText())
 					}else if(_eleVec[i] is DragImage)
 					{
-						_tab=DragImage(_eleVec[i]).getTitle()
-						_info=DragImage(_eleVec[i]).getURL()
+						_tab=DragImage(_eleVec[i]).getTitle();
+						_info=DragImage(_eleVec[i]).getURL();
 						//trace(DragImage(_eleVec[i]).getTitle(),DragImage(_eleVec[i]).getURL())
 					}
-					_tabData.appendChild(<{_tab}>{_info}</{_tab}>)
+					
+					_tabData.appendChild(<{_tab}>{_info}</{_tab}>);					
 				}
-				//trace(_tabData)
 			}
+			
+			public function setDataProvide($data:XML):void
+			{				
+				_testXML=XML($data);				
+			}
+			
 		]]>
 	</fx:Script>
 	<s:layout>

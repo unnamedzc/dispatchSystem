@@ -8,6 +8,7 @@ package com.jeff.dataView.dataElement
 	public class MyHGroupCombo extends FormItem
 	{
 		private var DDList:DropDownList=new DropDownList();
+		
 		[Bindable]
 		private var _depts:ArrayCollection = new ArrayCollection([
 			{label:"是", data:1}, 
@@ -17,6 +18,7 @@ package com.jeff.dataView.dataElement
 			this.label=$text
 			addElement(DDList);
 			DDList.dataProvider=_depts;
+			DDList.selectedIndex=0;
 			super();
 		}
 		public function getTitle():String
@@ -33,6 +35,17 @@ package com.jeff.dataView.dataElement
 				return "否"
 			}
 			return ""
+		}
+		public function setText($tex:String):void
+		{
+			//TextInput(label2).text=$tex;
+			if($tex=="否")
+			{
+				DDList.selectedIndex=1
+			}else
+			{
+				DDList.selectedIndex=0
+			}
 		}
 	}
 }

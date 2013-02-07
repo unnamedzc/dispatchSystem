@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:DateField xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			  xmlns:s="library://ns.adobe.com/flex/spark" 
+			  xmlns:mx="library://ns.adobe.com/flex/mx">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			/* override public function set data(value:Object):void{
+				if(listData){
+					var newDate:Date;
+					
+					if (value is String){
+						newDate = new Date(Date.parse(data as String));
+						super.data=newDate;
+					} 
+					else if (value is Date){
+						super.data=value as Date;
+					}
+				}        
+			} */
+			private function dateChanged(date:Date):void
+			{
+				trace("date is:",date);
+				if(date!=null){
+					this.selectedDate=new Date(Date.parse(date.getFullYear().toString() + 
+						'/' + (date.getMonth()+1).toString() + '/' + date.getDate()));
+				trace(date.getFullYear().toString() + 
+					'/' + (date.getMonth()+1).toString() + '/' + date.getDate())
+				}
+			}
+		]]>
+	</fx:Script>
+</mx:DateField>
