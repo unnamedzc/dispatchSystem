@@ -10,15 +10,16 @@
 			import Values.GlobalValue;
 			
 			import com.jeff.dataControler.DataManager;
+			import com.jeff.dataView.dataElement.MyHGroupLabel;
+			
 			import com.jeff.myEvent.XMLEvent;
 			
+			import mx.controls.Alert;
 			import mx.core.IVisualElementContainer;
 			import mx.managers.PopUpManager;
-			
-			//public var _ID:uint;
-			public var _editMode:uint;//0:增加数据，1：修改数据，2：查看数据
+			public var _editMode:uint;//0:增加数据，1：修改数据，2：查看数据, 3: test
 			private var _tempDataXML:XML;
-			//private var _editedData:XML=<emp></emp>
+
 			
 			private var _tabVec:Vector.<IVisualElementContainer>=new Vector.<IVisualElementContainer>();
 			/*
@@ -27,13 +28,24 @@
 			*/
 			private function changeData():void
 			{
-				//tn.getChildAt(0).setData();
-				//trace("all tab here is:",_tabVec);
-				//bug here add then edit and add
+				
+				//如果姓名为空，return；
+				//trace("teab:",MyHGroupLabel(TableTab(_tabVec[0])._eleVec[0]).getText())
+				 if(MyHGroupLabel(TableTab(_tabVec[0])._eleVec[0]).getText()=="")
+				{
+					Alert.buttonHeight=30;						
+					Alert.show('请至少填写司机的姓名!', '无法添加新数据');
+					return;
+				} 
+				/* 				
+				add mode to combine data	
+				edit mode to replace data
+				*/
+				
 				if(_editMode==0)//add
 				{
 					DataManager.getInstance()._empData.@id=GlobalValue._empId++;
-					for(var i:uint;i<_tabVec.length;++i)
+					for(var i:uint=0;i<_tabVec.length;++i)
 					{
 						if(_tabVec[i] is TableTab)
 						{
@@ -49,11 +61,45 @@
 					DataManager.getInstance()._wholeData.appendChild(DataManager.getInstance()._empData);
 					DataManager.getInstance().resetEmpXML();
 					//trace("in TitleWin:",DataManager.getInstance()._wholeData);
-					this.dispatchEvent(new XMLEvent(XMLEvent.DATA_COMBINED))
+					this.dispatchEvent(new XMLEvent(XMLEvent.DATA_COMBINED));
 				}else{
-					//edit mode
-					trace("_editMode is:",_editMode)
-				}
+					//edit mode here extend the setData()
+					/* 
+					var xml:XML = 
+					<body>
+					<p>Hello</p>
+					<p>World</p>
+					<hr/>
+					</body>;
+					
+					xml.replace(1, <p>Bob</p>);
+					trace(xml);				
+					*/
+					DataManager.getInstance()._empData.@id=GlobalValue._selectedMainSheetID
+					for(i=0;i<_tabVec.length;++i)
+					{
+						if(_tabVec[i] is TableTab)
+						{
+							TableTab(_tabVec[i]).setData(_editMode);
+							//tobe debug							
+							DataManager.getInstance().replaceData(i,TableTab(_tabVec[i])._tabData);
+						}
+						else if(_tabVec[i] is SheetTab)
+						{
+							// sheets.setData();
+							SheetTab(_tabVec[i]).setData(_editMode);				
+							//tobe debug							
+							DataManager.getInstance().replaceData(i,SheetTab(_tabVec[i])._tabData);
+						}
+					}
+					//trace("_editMode is:",_editMode,GlobalValue._empId);
+					DataManager.getInstance()._wholeData.replace(GlobalValue._selectedMainSheetID,DataManager.getInstance()._empData);
+					//trace("whole data is:",DataManager.getInstance()._wholeData)
+					DataManager.getInstance().resetEmpXML();
+					this.dispatchEvent(new XMLEvent(XMLEvent.DATA_COMBINED));					
+				}		
+				
+				PopUpManager.removePopUp(this);
 			}
 			private function onAdd():void
 			{
@@ -61,11 +107,10 @@
 			}
 			private function onCreated():void
 			{
+				
 				if(_editMode>0){
 					//窗口为可编辑
-					_tempDataXML=new XML();
-					//test Data todo to check which line has been choosen;
-					trace(XML(DataManager.getInstance()._wholeData));
+					_tempDataXML=new XML();				
 					_tempDataXML=XML(DataManager.getInstance()._wholeData.emp.(@id==GlobalValue._selectedMainSheetID));
 					//trace("TitleWin created:",_tempDataXML);
 				}			
@@ -74,7 +119,7 @@
 				var _tempXml:XML;
 				//一个标签，tab标签数量
 				var _tabNum:uint=0;
-				for(var i:uint;i<_len;++i)
+				for(var i:uint=0;i<_len;++i)
 				{					
 					_tempXml=XML(GlobalValue._xmlData.tab[i].elements);	
 					if(uint(GlobalValue._xmlData.tab[i].@isTable)!=0)
@@ -92,7 +137,6 @@
 								myT.setDataProvide(XML(_tempDataXML.mainTab));
 							}else
 							{
-								//trace("i is:",i,XML(_tempDataXML.tab[i-1]));
 								myT.setDataProvide(XML(_tempDataXML.tab[i-1]));
 							}
 						}
@@ -121,7 +165,7 @@
 	</s:layout>
 	<s:VGroup width="100%" height="100%">
 		<s:HGroup>			
-			<s:Button label="确定" click="changeData();PopUpManager.removePopUp(this);System.gc()"/>
+			<s:Button label="确定" click="changeData();System.gc()"/>
 			<s:Button label="取消" click="PopUpManager.removePopUp(this);System.gc()"/>
 		</s:HGroup>
 		<mx:TabNavigator id="tn" height="100%" width="100%" color="0x323232"/>

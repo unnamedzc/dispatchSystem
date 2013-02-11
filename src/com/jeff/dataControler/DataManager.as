@@ -42,9 +42,9 @@ package com.jeff.dataControler
 		}	
 		
 		//edit emp Data
-		public function replaceData():void
+		public function replaceData($pos:uint,$xml:XML=null):void
 		{
-			
+			_empData.replace($pos,$xml);
 		}
 		
 		public function resetEmpXML():void

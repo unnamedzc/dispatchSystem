@@ -91,7 +91,7 @@
 			}
 			
 			//after click "确定按钮牛"
-			public function setData():void
+			public function setData($editMode:uint=0):void
 			{
 				//_tabData
 				var	_len:uint=_myXML.e.length();
@@ -101,7 +101,7 @@
 					_tabData=<mainTab></mainTab>
 					//_tabData.appendChild(<{_tab}>{_info}</{_tab}>)
 				}
-				for(var i:uint;i<_len;++i)
+				for(var i:uint=0;i<_len;++i)
 				{
 //					trace(_myScro._myForm.getChildAt(i))
 					if(_eleVec[i] is MyHGroupLabel)
@@ -125,10 +125,18 @@
 						_info=DragImage(_eleVec[i]).getURL();
 						//trace(DragImage(_eleVec[i]).getTitle(),DragImage(_eleVec[i]).getURL())
 					}
-					
-					_tabData.appendChild(<{_tab}>{_info}</{_tab}>);					
+					if($editMode==0)
+					{
+						//如果是增加模式，则添加数据
+						_tabData.appendChild(<{_tab}>{_info}</{_tab}>);	
+					}else
+					{
+						//replace;xml.replace(1, <p>Bob</p>);
+						_tabData.replace(i,<{_tab}>{_info}</{_tab}>);	
+
+					}
 				}
-			}
+			}	
 			
 			public function setDataProvide($data:XML):void
 			{				

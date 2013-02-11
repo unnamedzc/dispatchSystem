@@ -108,11 +108,9 @@
 						}
 						dataArr.addItem(_tempObj);
 					}
-					//trace("/n\n",dataArr.length);
-					//trace("testXML in SheetTab:",_testXML.rowData.length());
 				}
 				
-				//==============dataProvider todo set date in dg
+				//==============dataProvider set date in dg
 				dg.dataProvider=dataArr;
 			}
 			
@@ -166,11 +164,10 @@
 				}
 			}
 			//			
-			private function showSheetXML():void
+			private function showSheetXML($mode:uint=0):void
 			{
-				var _len:uint=dataArr.length
-			//	trace(dataArr,dataArr.length);
-					//todo combine xml
+				var _len:uint=dataArr.length;
+					
 				var _tab:String;
 				var _info:String;
 				for(var i:uint;i<_len;++i)
@@ -178,7 +175,7 @@
 					_rowData=<rowData></rowData>;
 					for(var j:uint=0;j<_rowNum;++j)
 					{
-						trace(dataArr[i][j.toString()]);
+						//trace(dataArr[i][j.toString()]);
 						_tab=_myXML.e[j].@name;
 						if(dataArr[i][j.toString()]!=undefined)
 						{
@@ -187,17 +184,29 @@
 						{
 							_info="";
 						}
-						_rowData.appendChild(<{_tab}>{_info}</{_tab}>)
+						if($mode==0)
+						{//add mode
+							_rowData.appendChild(<{_tab}>{_info}</{_tab}>)
+						}else
+						{//edit mode
+							_rowData.replace(j,<{_tab}>{_info}</{_tab}>)
+						}
 					}
-					_tabData.appendChild(_rowData);
+					if($mode==0)
+					{//add mode
+						_tabData.appendChild(_rowData);
+					}else
+					{//edit mode
+						_tabData.replace(i,_rowData)
+					}
 				}
-				trace(_rowData)
+				//trace("replaced SheetXML:",_tabData)
 				//trace(dataArr);
 			}
 			
-			public function setData():void
+			public function setData($mode:uint=0):void
 			{
-				showSheetXML();				
+				showSheetXML($mode);				
 			}
 			
 			public function setDataProvide($data:XML=null):void

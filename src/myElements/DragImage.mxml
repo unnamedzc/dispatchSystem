@@ -12,7 +12,7 @@
 			
 			//private var fileArray:ArrayCollection;
 			[Bindable]
-			public var ImageUrl:String;
+			private var ImageUrl:String;
 			protected function addedToCom():void
 			{
 				addEventListener(NativeDragEvent.NATIVE_DRAG_ENTER, dragEnter);
@@ -66,6 +66,11 @@
 				ImageUrl=$tex;
 			}
 			
+			//assign url of imageUrl;
+			private function _setNewUrl():void
+			{
+				trace(ImageUrl);
+			}
 		]]>
 	</fx:Script>
 	

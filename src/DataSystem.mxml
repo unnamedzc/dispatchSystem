@@ -32,10 +32,13 @@
 			import com.jeff.dataControler.DataManager;
 			import com.jeff.myEvent.XMLEvent;
 			
+			import mx.containers.TitleWindow;
 			import mx.core.IFlexDisplayObject;
 			import mx.managers.PopUpManager;
 			
 			import myComponents.TitleWindows;
+			
+			import spark.components.TextArea;
 			private var addTileWin:TitleWindows;
 			
 			public function getData():void
@@ -100,21 +103,65 @@
 			private function deleteRow():void
 			{				
 				var _selectedId:uint=mainTable.selectedIndex
-					
+				// 删除一行后，将后面行的ID自动往前移	
 				if(_selectedId<0)
 				{
 					return;
 				}
-				trace("delete:",mainTable.selectedIndex);
+				//trace("delete:",mainTable.selectedIndex,DataManager.getInstance()._wholeData.emp.length());
+				var _empLen:uint=DataManager.getInstance()._wholeData.emp.length();
+				/*
+				删除一行数据，并将后面的数据id--；同时，empid也需要减一
+				
+				*/
+				if(_empLen>_selectedId)
+					for(var i:uint=_selectedId+1;i<_empLen;++i)
+					{
+						trace("delete loop:",--DataManager.getInstance()._wholeData.emp[i].@id);
+					}
 				delete DataManager.getInstance()._wholeData.emp[_selectedId];
-				_refreshMainTable()
-				trace( DataManager.getInstance()._wholeData)
+				_refreshMainTable();
+				/*
+				删除结束后，需要将empid减一，为后面添加数据做准备
+				*/
+				GlobalValue._empId--;
+				
 			}
 			
 			//create whole data
 			private function _refreshMainTable(e:XMLEvent=null):void
 			{				
+				//trace("in Main:",DataManager.getInstance()._wholeData);
 				mainTable.dataProvider= DataManager.getInstance()._wholeData.emp.mainTab;					
+			}
+			//
+			private function addTestWin():void
+			{		
+				//$mode=0:add 1:edit 2:check
+				//应该设为全局				
+				var testTileWin:TitleWindow=TitleWindow(PopUpManager.createPopUp(this, TitleWindow,true));
+				
+				//test win
+				testTileWin.title="check XML";
+				
+				testTileWin.addEventListener("close", testCloseHandler);
+				testTileWin.showCloseButton=true;
+				testTileWin.x=20;
+				testTileWin.y=20;
+				
+				testTileWin.width=this.width-40;
+				testTileWin.height=this.height-40;
+				
+				var tex:TextArea=new TextArea();
+				testTileWin.addElement(tex);
+				tex.width=testTileWin.width-10;
+				tex.height=testTileWin.height-50;
+				tex.text=DataManager.getInstance()._wholeData;
+				function testCloseHandler(event:Event):void {
+					event.target.removeEventListener("close", closeHandler);					
+					PopUpManager.removePopUp(event.target as IFlexDisplayObject);
+					System.gc();
+				}
 			}
 		]]>
 	</fx:Script>
@@ -149,6 +196,7 @@
 					<s:Button label="添加" click="addTitleWin()"/>
 					<s:Button label="删除" click="deleteRow()"/>
 					<s:Button label="修改" click="addTitleWin(1)"/>
+					<s:Button label="查看xml" click="trace('**********\nthis is XML:\n',DataManager.getInstance()._wholeData);addTestWin()"/>
 				</s:HGroup>
 				<myComponents:MainSheet id="mainTable" width="100%" height="100%"/>
 			</s:VGroup>				
