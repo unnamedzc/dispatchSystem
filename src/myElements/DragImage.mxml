@@ -4,21 +4,34 @@
 		 xmlns:mx="library://ns.adobe.com/flex/mx" width="250" height="350" added="addedToCom()">
 	<fx:Script>
 		<![CDATA[
+			import Values.GlobalValue;
+			
+			import com.jeff.myEvent.ElementEvent;
+			
 			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
 			import mx.events.FlexEvent;
+			import mx.graphics.codec.JPEGEncoder;
 			import mx.managers.DragManager;
+			import mx.managers.PopUpManager;
+			
+			import myComponents.LoadingTitleWin;
 			
 			import spark.events.IndexChangeEvent;
 			
 			//private var fileArray:ArrayCollection;
 			[Bindable]
 			private var ImageUrl:String;
+			//name extend 			
+			public var _extendName:String="default.jpg";
+			
 			protected function addedToCom():void
 			{
 				addEventListener(NativeDragEvent.NATIVE_DRAG_ENTER, dragEnter);
 				addEventListener(NativeDragEvent.NATIVE_DRAG_DROP, dragDrop);
 				//fileArray = new ArrayCollection();
 				//fileList.dataProvider = fileArray;
+			
 			}
 			
 			private function dragEnter(e:NativeDragEvent):void
@@ -41,9 +54,74 @@
 							
 						ImageUrl=file.nativePath;
 						startImage.source=ImageUrl;
-						
+						GlobalValue._loadingMask=LoadingTitleWin(PopUpManager.createPopUp(this, LoadingTitleWin,true));	
+						PopUpManager.centerPopUp(GlobalValue._loadingMask);					
 					}
 				}
+			}
+			
+			/*
+			完成加载后将图片缓存到本地  
+			*/
+			private function saveJpg(e:Event):void
+			{
+				//trace(startImage.source,(e.target.content  as Bitmap).width);
+				var _height:uint=(e.target.content  as Bitmap).height;
+				var _width:uint=(e.target.content  as Bitmap).width;
+				var bitmapData:BitmapData=new BitmapData(_width,_height);
+						
+				bitmapData.draw(Image(startImage));
+				var jpgenc:JPEGEncoder;
+				var imgByteArray:ByteArray 
+				if(_height>500||_width>500){
+					var copybitmapData:BitmapData=scaleBitmapData(bitmapData,.5,.5);
+					//trace(file.name,bitmapData);
+					jpgenc = new JPEGEncoder(30);
+					imgByteArray = jpgenc.encode(copybitmapData);
+				}else
+				{
+					jpgenc = new JPEGEncoder(50);
+					imgByteArray = jpgenc.encode(bitmapData);
+				}
+				//				
+				var fl:File 
+				if(GlobalValue._debug)
+				{
+					fl= File.desktopDirectory.resolvePath(_extendName);
+				}else
+				{
+					fl = new File(File.applicationDirectory.nativePath);
+					fl = fl.resolvePath(_extendName);
+					
+					//fl= File.applicationDirectory.resolvePath(_extendName);
+					trace("extend:",fl.nativePath);
+				}
+				var fs:FileStream = new FileStream();
+				try{  
+					//open file in write mode  
+					fs.open(fl,FileMode.WRITE);  
+					//write bytes from the byte array  
+					fs.writeBytes(imgByteArray);  
+					//close the file  
+					fs.close();  
+				}catch(e:Error){  
+					trace(e);  
+				} 
+				//加载完成，隐藏mask
+				if(GlobalValue._loadingMask)
+				{
+					GlobalValue._loadingMask.dispatchEvent(new ElementEvent("update"));
+				}
+			}
+			
+			//scale 
+			private function scaleBitmapData(bmpData:BitmapData, scaleX:Number, scaleY:Number):BitmapData
+			{
+				var matrix:Matrix = new Matrix();
+				matrix.scale(scaleX, scaleY);
+				var bmpData_:BitmapData = new BitmapData(scaleX * bmpData.width, scaleY * bmpData.height, true, 0);
+				bmpData_.draw(bmpData, matrix);
+				return bmpData_;
 			}
 			
 			protected function fileList_changeHandler(event:IndexChangeEvent):void
@@ -57,20 +135,18 @@
 			}
 			
 			public function getURL():String
-			{
-				return "url"
+			{				
+				return _extendName;
 			}
 			
+			//只在编辑的时候有用，用于添加图片到image里面。
 			public function setText($tex:String):void
 			{
 				ImageUrl=$tex;
-			}
+				startImage.source=ImageUrl;
+				//trace("in DragImage:",ImageUrl)
+			}			
 			
-			//assign url of imageUrl;
-			private function _setNewUrl():void
-			{
-				trace(ImageUrl);
-			}
 		]]>
 	</fx:Script>
 	
@@ -109,7 +185,7 @@
 			</mx:Text>
 		</mx:Canvas>
 		<mx:Canvas width="100%" height="100%">
-			<mx:Image id="startImage" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle" complete="startVS.selectedIndex = 1;"/>
+			<mx:Image id="startImage" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle" complete="startVS.selectedIndex = 1;saveJpg(event)"/>
 		</mx:Canvas>
 	</mx:ViewStack>
 	

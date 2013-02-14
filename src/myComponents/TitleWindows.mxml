@@ -87,7 +87,7 @@
 						else if(_tabVec[i] is SheetTab)
 						{
 							// sheets.setData();
-							SheetTab(_tabVec[i]).setData(_editMode);				
+							SheetTab(_tabVec[i]).setData(_editMode);		
 							//tobe debug							
 							DataManager.getInstance().replaceData(i,SheetTab(_tabVec[i])._tabData);
 						}

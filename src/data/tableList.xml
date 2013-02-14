@@ -39,6 +39,7 @@
 		<tabId>2</tabId>
 		<tabName>交易记录/交易评价</tabName>
 		<elements>
+			<e name="行"/>
 			<e name="时间"/>
 			<e name="起运地"/>
 			<e name="目的地"/>

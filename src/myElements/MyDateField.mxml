@@ -7,6 +7,10 @@
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
+			private function onCreated():void
+			{
+				this.selectedDate=new Date();
+			}
 			/* override public function set data(value:Object):void{
 				if(listData){
 					var newDate:Date;

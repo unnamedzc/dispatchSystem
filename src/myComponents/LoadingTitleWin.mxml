@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" creationComplete="initListener()">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import mx.core.IVisualElement;
+			import com.jeff.myEvent.ElementEvent;
+			import mx.managers.PopUpManager;			
+			private function initListener():void
+			{
+				closeButton.visible=false;
+				(titleDisplay as IVisualElement).parent.visible = false;
+				//this.x = Capabilities.screenResolutionX/2-this.width/2；
+				//this.y = Capabilities.screenResolutionY/2-this.height/2 - 50；
+				this.addEventListener(ElementEvent.UPDATE,onUpdate);
+			}
+			private function onUpdate(e:ElementEvent):void{
+				//closeBt.visible=true;
+				PopUpManager.removePopUp(this);
+				System.gc()
+			}
+		]]>
+	</fx:Script>
+	<s:layout>
+		<s:VerticalLayout/>
+	</s:layout>
+	<s:Label id="text1" text="系统处理数据数据中..."/>
+	<!--<s:Button id="closeBt" label="确定" click="PopUpManager.removePopUp(this);System.gc()"/>-->
+	
+</s:TitleWindow>

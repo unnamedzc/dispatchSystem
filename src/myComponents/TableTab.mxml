@@ -7,6 +7,8 @@
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
+			import Values.GlobalValue;
+			
 			import com.jeff.dataView.dataElement.MyHGroupCombo;
 			import com.jeff.dataView.dataElement.MyHGroupLabel;
 			import com.jeff.dataView.dataElement.MyVGroupText;
@@ -50,6 +52,17 @@
 						var myI:DragImage=new DragImage();
 						_eleVec.push(myI);
 						myI.title=_myXML.e[i].@name;
+						//myI url
+						if(myI.title=="照片")
+						{
+							myI._extendName="pic/"+String(GlobalValue._empId)+"_pic.jpg";
+						}else if(myI.title=="指纹")
+						{
+							myI._extendName="pic/"+String(GlobalValue._empId)+"_finger.jpg";
+						}else if(myI.title=="车辆照片")
+						{
+							myI._extendName="pic/"+String(GlobalValue._empId)+"_trunk.jpg";
+						}
 						_myScro._mysubG2.addElement(myI);
 						myI.setText(_testStr);						
 					}

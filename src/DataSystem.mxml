@@ -50,7 +50,9 @@
 				maximize();
 				_resizeAllComponent()
 				showStatusBar=false;
-				DataManager.getInstance().saveData();
+				DataManager.getInstance().loadData();
+				DataManager.getInstance().addEventListener(XMLEvent.XML_LOADED,onXmlLoaded)
+				
 			}
 			
 			private function loaderCompleteHandler(event:Event):void
@@ -90,7 +92,7 @@
 				{
 					addTileWin.width=this.width-40;
 					addTileWin.height=this.height-40;
-				}
+				}				
 			}
 			//关闭弹出窗口
 			private function closeHandler(event:Event):void {
@@ -120,6 +122,30 @@
 						trace("delete loop:",--DataManager.getInstance()._wholeData.emp[i].@id);
 					}
 				delete DataManager.getInstance()._wholeData.emp[_selectedId];
+				/* 
+					todo combine in a jpg manager
+				
+				 */
+				//delete jpg file
+				var _flPic:File= new File(File.applicationDirectory.nativePath);
+				_flPic = _flPic.resolvePath("pic/"+_selectedId.toString()+"_pic.jpg");
+				if(_flPic.exists)
+				{
+					_flPic.deleteFile();
+				}				
+				var _flFinger:File= new File(File.applicationDirectory.nativePath);
+				_flFinger = _flFinger.resolvePath("pic/"+_selectedId.toString()+"_finger.jpg");
+				if(_flFinger.exists)
+				{
+					_flFinger.deleteFile();
+				}
+				var _flTrunk:File= new File(File.applicationDirectory.nativePath);
+				_flTrunk = _flTrunk.resolvePath("pic/"+_selectedId.toString()+"_trunk.jpg");
+				if(_flTrunk.exists)
+				{
+					_flTrunk.deleteFile();
+				}			
+				//////////================================
 				_refreshMainTable();
 				/*
 				删除结束后，需要将empid减一，为后面添加数据做准备
@@ -128,13 +154,18 @@
 				
 			}
 			
+			//当加载完成了数据库数据后
+			private function onXmlLoaded(e:XMLEvent):void
+			{
+				_refreshMainTable();
+			}
 			//create whole data
 			private function _refreshMainTable(e:XMLEvent=null):void
 			{				
 				//trace("in Main:",DataManager.getInstance()._wholeData);
 				mainTable.dataProvider= DataManager.getInstance()._wholeData.emp.mainTab;					
 			}
-			//
+			//test
 			private function addTestWin():void
 			{		
 				//$mode=0:add 1:edit 2:check
@@ -162,6 +193,11 @@
 					PopUpManager.removePopUp(event.target as IFlexDisplayObject);
 					System.gc();
 				}
+			}
+			
+			private function savetest():void
+			{
+				DataManager.getInstance().saveData();
 			}
 		]]>
 	</fx:Script>
@@ -196,7 +232,8 @@
 					<s:Button label="添加" click="addTitleWin()"/>
 					<s:Button label="删除" click="deleteRow()"/>
 					<s:Button label="修改" click="addTitleWin(1)"/>
-					<s:Button label="查看xml" click="trace('**********\nthis is XML:\n',DataManager.getInstance()._wholeData);addTestWin()"/>
+					<s:Button label="查看xml" click="addTestWin()"/>
+					<s:Button label="saveTest" click="savetest()"/>
 				</s:HGroup>
 				<myComponents:MainSheet id="mainTable" width="100%" height="100%"/>
 			</s:VGroup>				

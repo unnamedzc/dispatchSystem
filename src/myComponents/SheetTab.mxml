@@ -61,15 +61,17 @@
 					GridName.headerText=_myXML.e[i].@name;
 					
 					GridName.dataField=i.toString();
-				 	  if(_myXML.e[i].@name=="时间")
-					{
-						
+				 	if(_myXML.e[i].@name=="时间")
+					{						
 						var myDateField:ClassFactory = new ClassFactory(MyDateField);							
-						GridName.itemRenderer=myDateField;						
-						//GridName.dataField="dataField";
+						GridName.itemRenderer=myDateField;	
 						GridName.rendererIsEditor=true;
 						GridName.editorDataField="selectedDate";
 						GridName.width=String(_myXML.e[i].@name).length*60;
+					}else if(_myXML.e[i].@name=="行")
+					{
+						GridName.width=String(_myXML.e[i].@name).length*30;
+						GridName.editable=false;						
 					}else
 					{ 
 						GridName.width=String(_myXML.e[i].@name).length*30;
@@ -77,7 +79,6 @@
 					_columns.push(GridName);
 				}
 				dg.columns=_columns;
-				//
 				
 				//get data
 				if(_testXML!=null){
@@ -92,7 +93,10 @@
 						for(var j:uint=0;j<_rowNum;++j)
 						{
 							_testStr=_testXML.rowData[i].elements("*")[j]
-							if(j==0){
+							if(j==1){
+								/*
+								如果添加了列，请在这里修改 date
+								*/
 								//将xml中的string型装换为date
 								_tempObj[j.toString()]=new Date(Date.parse(_testStr));
 							}else
@@ -126,29 +130,30 @@
 			//增加一行空数据
 			private function addRow():void
 			{
-				var _len:uint=dataArr.length;
-				
-				if(_len>0)
+				var _len:uint=dataArr.length;				
+				/* if(_len>0)
 				{
 					var _prevLen:uint;
-					for(var i:uint;i<_rowNum;++i)
-					{
+					//for(var i:uint=1;i<_rowNum;++i)
+					//{
 					//	trace(dataArr[_len-1][i.toString()])
-						if(dataArr[_len-1][i.toString()]==undefined)
+						if(dataArr[_len-1]["1"]==undefined)
 						{
-							_prevLen++;
-						}
-					}
-					if(_prevLen==_rowNum)
-					{
-						Alert.buttonHeight=30;						
-						Alert.show('请在最新添加的数据行中至少填写一项数据!', '无法添加新数据');
-						
-						return;
-					}
-				}
-			
-				var item:Object={};
+							//_prevLen++;
+							Alert.buttonHeight=30;						
+							Alert.show('请填写时间!', '无法添加新数据');						
+							return;
+						} 
+				//	}
+					//if(_prevLen==_rowNum)
+					//{
+						//Alert.buttonHeight=30;						
+						//Alert.show('请在最新添加的数据行中至少填写一项数据!', '无法添加新数据');						
+						//return;
+					//}
+				}	 */
+				trace("dataArr.length:",_len)
+				var item:Object={"0":_len+1,"1":new Date()};
 				dataArr.addItem(item);
 				dg.dataProvider=dataArr;				
 			}	
@@ -160,6 +165,10 @@
 					var item4:Object=dg.selectedItem;
 					var index:int=dataArr.getItemIndex(item4);
 					dataArr.removeItemAt(index);
+					for(var i:uint=index;i<dataArr.length;++i)
+					{
+						dataArr[i]["0"]=i+1;
+					}
 					dg.dataProvider=dataArr;
 				}
 			}
@@ -227,7 +236,7 @@
 			<s:Button label="test" click="showSheetXML()"/>
 		</s:HGroup>
 		<s:Group id="MainSheet" width="100%" height="100%" creationComplete="assignScroll()">
-			<mx:DataGrid id="dg" draggableColumns="false" fontSize="15" editable="true" creationComplete="creatData()"/>
+			<mx:DataGrid id="dg" draggableColumns="false" fontSize="15" editable="true" height="100%" creationComplete="creatData()"/>
 				
 		</s:Group>	
 	</s:VGroup>

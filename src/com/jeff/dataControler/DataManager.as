@@ -2,9 +2,16 @@ package com.jeff.dataControler
 {
 	import com.jeff.myEvent.XMLEvent;
 	
+	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.IEventDispatcher;
+	import flash.filesystem.File;
+	import flash.filesystem.FileMode;
 	import flash.filesystem.FileStream;
+	import flash.net.URLLoader;
+	import flash.net.URLLoaderDataFormat;
+	import flash.net.URLRequest;
+	import flash.utils.ByteArray;
 	
 	public class DataManager extends EventDispatcher
 	{
@@ -24,15 +31,66 @@ package com.jeff.dataControler
 		*/
 		public var _wholeData:XML=<data></data>;
 		public var _empData:XML=<emp></emp>;
+		//file
+		private var _loadPath:String="database/data.dat"
+		//private var _fl:File= new File(File.applicationDirectory.nativePath);
+		//private var _xmlByteArray:ByteArray;
+		//private var _fs:FileStream = new FileStream();
 		public function DataManager(enforcer:SingletonEnforcer,target:IEventDispatcher=null)
 		{
 			super(target);
+		}
+		
+		//data
+		//load data
+		public function loadData():void
+		{
+			var loader:URLLoader = new URLLoader();
+			loader.dataFormat = URLLoaderDataFormat.BINARY;
+			var urlRequest:URLRequest = new URLRequest(_loadPath);
+			loader.addEventListener("complete",completeHandler);
+			loader.load(urlRequest);
+		}
+		private function completeHandler(e:Event):void
+		{	
+			if(e.currentTarget.data!=null)
+			{
+				var bytes:ByteArray = ByteArray(e.currentTarget.data);
+			
+				var xmlStr:String = bytes.readMultiByte(bytes.length,"utf-8");
+				_wholeData = XML(xmlStr);
+				//trace(_wholeData);
+				this.dispatchEvent(new XMLEvent(XMLEvent.XML_LOADED));
+			}
 		}
 		//save data 
 		public function saveData():void
 		{
 			trace("save data");
+			var _xmlByteArray:ByteArray=new ByteArray();
+			_xmlByteArray.writeUTFBytes(_wholeData.toString());
+			trace("_xmlByteArray Size is:",_xmlByteArray.length);
+			var _fl:File= new File(File.applicationDirectory.nativePath);
+			_fl = _fl.resolvePath(_loadPath);
+		//	var file:File = File.documentsDirectory.resolvePath("DeleteMe.txt");
+			if(_fl.exists)
+			{
+				_fl.deleteFile();
+			}
+			//todo compress			
 			var _fs:FileStream = new FileStream();
+			//_fs.position=_xmlByteArray.length;
+			try{  
+				//open file in write mode  
+				_fs.open(_fl,FileMode.WRITE);  
+				//write bytes from the byte array  
+				_fs.writeBytes(_xmlByteArray);  
+				//close the file  
+				_fs.close();  
+			}catch(e:Error){  
+				trace(e);  
+			} 
+			_xmlByteArray.clear();
 			
 		}
 		//combine emp Data
@@ -52,10 +110,6 @@ package com.jeff.dataControler
 			_empData=<emp></emp>;
 		}
 		
-		public function loadData():void
-		{
-			
-		}
 		//single
 		public static function getInstance():DataManager
 		{

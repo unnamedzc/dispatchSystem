@@ -1,6 +1,8 @@
 package Values
 {
 	
+	import myComponents.LoadingTitleWin;
+	
 	import spark.components.Scroller;
 
 	public class GlobalValue
@@ -18,5 +20,10 @@ package Values
 		//正在编辑的驾驶员id
 		public static var _empId:uint;
 		
+		//debug switch
+		public static var _debug:Boolean=false;
+		
+		//系统处理数据mask
+		public static var _loadingMask:LoadingTitleWin//=new LoadingTitleWin();
 	}
 }
