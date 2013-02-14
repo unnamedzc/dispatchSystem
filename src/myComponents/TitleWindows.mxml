@@ -110,9 +110,9 @@
 				
 				if(_editMode>0){
 					//窗口为可编辑
-					_tempDataXML=new XML();				
+					_tempDataXML=new XML();
 					_tempDataXML=XML(DataManager.getInstance()._wholeData.emp.(@id==GlobalValue._selectedMainSheetID));
-					//trace("TitleWin created:",_tempDataXML);
+					
 				}			
 				//creat the xml according to the assigned XML not data
 				var _len:uint=GlobalValue._xmlData.tab.length();

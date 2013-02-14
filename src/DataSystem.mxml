@@ -30,12 +30,14 @@
 			import Values.GlobalValue;
 			
 			import com.jeff.dataControler.DataManager;
+			import com.jeff.myEvent.ElementEvent;
 			import com.jeff.myEvent.XMLEvent;
 			
 			import mx.containers.TitleWindow;
 			import mx.core.IFlexDisplayObject;
 			import mx.managers.PopUpManager;
 			
+			import myComponents.LoadingTitleWin;
 			import myComponents.TitleWindows;
 			
 			import spark.components.TextArea;
@@ -52,7 +54,9 @@
 				showStatusBar=false;
 				DataManager.getInstance().loadData();
 				DataManager.getInstance().addEventListener(XMLEvent.XML_LOADED,onXmlLoaded)
-				
+				//mask when loading xml
+				GlobalValue._loadingMask=LoadingTitleWin(PopUpManager.createPopUp(this, LoadingTitleWin,true));	
+				PopUpManager.centerPopUp(GlobalValue._loadingMask);
 			}
 			
 			private function loaderCompleteHandler(event:Event):void
@@ -94,6 +98,7 @@
 					addTileWin.height=this.height-40;
 				}				
 			}
+			
 			//关闭弹出窗口
 			private function closeHandler(event:Event):void {
 				event.target.removeEventListener("close", closeHandler);
@@ -123,7 +128,7 @@
 					}
 				delete DataManager.getInstance()._wholeData.emp[_selectedId];
 				/* 
-					todo combine in a jpg manager
+					todo combine the following in a jpg manager
 				
 				 */
 				//delete jpg file
@@ -158,6 +163,8 @@
 			private function onXmlLoaded(e:XMLEvent):void
 			{
 				_refreshMainTable();
+				GlobalValue._loadingMask.dispatchEvent(new ElementEvent(ElementEvent.UPDATE));
+				
 			}
 			//create whole data
 			private function _refreshMainTable(e:XMLEvent=null):void

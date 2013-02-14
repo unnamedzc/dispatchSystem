@@ -13,6 +13,7 @@ package com.jeff.dataControler
 	import flash.net.URLRequest;
 	import flash.utils.ByteArray;
 	
+	import Values.GlobalValue;
 	public class DataManager extends EventDispatcher
 	{
 		private static var _instance:DataManager;
@@ -59,7 +60,8 @@ package com.jeff.dataControler
 			
 				var xmlStr:String = bytes.readMultiByte(bytes.length,"utf-8");
 				_wholeData = XML(xmlStr);
-				//trace(_wholeData);
+				GlobalValue._empId=_wholeData.emp.length();
+				trace(_wholeData.emp.length());
 				this.dispatchEvent(new XMLEvent(XMLEvent.XML_LOADED));
 			}
 		}
