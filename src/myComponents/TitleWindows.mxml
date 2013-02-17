@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
-			   xmlns:mx="library://ns.adobe.com/flex/mx" title="添加数据" addedToStage="onAdd()" creationComplete="onCreated()">
+			   xmlns:mx="library://ns.adobe.com/flex/mx" title="操作数据窗口" addedToStage="onAdd()" creationComplete="onCreated()">
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 	</fx:Declarations>
@@ -10,14 +10,18 @@
 			import Values.GlobalValue;
 			
 			import com.jeff.dataControler.DataManager;
+			import com.jeff.dataControler.JpgManager;
 			import com.jeff.dataView.dataElement.MyHGroupLabel;
-			
+			import com.jeff.myEvent.ElementEvent;
 			import com.jeff.myEvent.XMLEvent;
 			
 			import mx.controls.Alert;
+			import mx.core.IVisualElement;
 			import mx.core.IVisualElementContainer;
 			import mx.managers.PopUpManager;
-			public var _editMode:uint;//0:增加数据，1：修改数据，2：查看数据, 3: test
+			
+			import myElements.DragImage;
+			public var _editMode:uint;//0:增加数据，1：修改数据，2：查看数据,
 			private var _tempDataXML:XML;
 
 			
@@ -28,15 +32,26 @@
 			*/
 			private function changeData():void
 			{
-				
-				//如果姓名为空，return；
-				//trace("teab:",MyHGroupLabel(TableTab(_tabVec[0])._eleVec[0]).getText())
-				 if(MyHGroupLabel(TableTab(_tabVec[0])._eleVec[0]).getText()=="")
+				//trace("check byteArray:",JpgManager.getInstance().dragImageVec[0].)
+				//如果姓名为空，return；				
+				 if(MyHGroupLabel(TableTab(_tabVec[0])._eleVec[0]).getText()==""||MyHGroupLabel(TableTab(_tabVec[0])._eleVec[1]).getText()=="")
 				{
 					Alert.buttonHeight=30;						
-					Alert.show('请至少填写司机的姓名!', '无法添加新数据');
+					Alert.show('司机的姓名和身份证为空，请正确填写!', '无法添加新数据');
 					return;
-				} 
+				}
+				 var _empNameId:String=MyHGroupLabel(TableTab(_tabVec[0])._eleVec[0]).getText()+"_"+MyHGroupLabel(TableTab(_tabVec[0])._eleVec[1]).getText();
+				 //dispatch jpgevent
+				//trace(JpgManager.getInstance().dragImageVec);
+				var _len:uint=JpgManager.getInstance().dragImageVec.length;
+				for(var i:uint=0;i<_len;++i)
+				{
+					if(DragImage(JpgManager.getInstance().dragImageVec[i]).dragedImage)
+					{
+						trace("this is:",JpgManager.getInstance().dragImageVec[i]);
+						JpgManager.getInstance().dragImageVec[i].dispatchEvent(new ElementEvent(ElementEvent.CREATE_JPG,_empNameId));
+					}
+				}
 				/* 				
 				add mode to combine data	
 				edit mode to replace data
@@ -45,7 +60,9 @@
 				if(_editMode==0)//add
 				{
 					DataManager.getInstance()._empData.@id=GlobalValue._empId++;
-					for(var i:uint=0;i<_tabVec.length;++i)
+					//JpgManager.getInstance()._jpgId++;
+					_len=_tabVec.length
+					for(i=0;i<_len;++i)
 					{
 						if(_tabVec[i] is TableTab)
 						{
@@ -64,31 +81,20 @@
 					this.dispatchEvent(new XMLEvent(XMLEvent.DATA_COMBINED));
 				}else{
 					//edit mode here extend the setData()
-					/* 
-					var xml:XML = 
-					<body>
-					<p>Hello</p>
-					<p>World</p>
-					<hr/>
-					</body>;
 					
-					xml.replace(1, <p>Bob</p>);
-					trace(xml);				
-					*/
-					DataManager.getInstance()._empData.@id=GlobalValue._selectedMainSheetID
-					for(i=0;i<_tabVec.length;++i)
+					DataManager.getInstance()._empData.@id=GlobalValue._selectedMainSheetID;
+					_len=_tabVec.length
+					for(i=0;i<_len;++i)
 					{
 						if(_tabVec[i] is TableTab)
 						{
 							TableTab(_tabVec[i]).setData(_editMode);
-							//tobe debug							
 							DataManager.getInstance().replaceData(i,TableTab(_tabVec[i])._tabData);
 						}
 						else if(_tabVec[i] is SheetTab)
 						{
 							// sheets.setData();
-							SheetTab(_tabVec[i]).setData(_editMode);		
-							//tobe debug							
+							SheetTab(_tabVec[i]).setData(_editMode);	
 							DataManager.getInstance().replaceData(i,SheetTab(_tabVec[i])._tabData);
 						}
 					}
@@ -112,8 +118,13 @@
 					//窗口为可编辑
 					_tempDataXML=new XML();
 					_tempDataXML=XML(DataManager.getInstance()._wholeData.emp.(@id==GlobalValue._selectedMainSheetID));
+					if(_editMode==2)
+					{
+						ok.visible=cancel.visible=false;
+					}
 					
-				}			
+				}
+				
 				//creat the xml according to the assigned XML not data
 				var _len:uint=GlobalValue._xmlData.tab.length();
 				var _tempXml:XML;
@@ -126,6 +137,7 @@
 					{
 						//输入框形式
 						var myT:TableTab=new TableTab();
+						myT._editMode=_editMode;
 						myT._tabID=i;
 						_tabVec.push(myT);
 						myT.myXML=_tempXml;
@@ -144,6 +156,7 @@
 					{
 						//列表形式
 						var myS:SheetTab=new SheetTab();
+						myS._editMode=_editMode;
 						_tabVec.push(myS);
 						myS.myXML=_tempXml;
 						tn.addItem(myS);
@@ -158,6 +171,13 @@
 			{
 				trace("changeTab:",e.target.name);
 			}
+			
+			private function dispose():void
+			{
+				JpgManager.getInstance().dragImageVec=new Vector.<IVisualElement>;
+				JpgManager.getInstance().dragImageVec.length=0;
+				
+			}
 		]]>
 	</fx:Script>
 	<s:layout>
@@ -165,8 +185,8 @@
 	</s:layout>
 	<s:VGroup width="100%" height="100%">
 		<s:HGroup>			
-			<s:Button label="确定" click="changeData();System.gc()"/>
-			<s:Button label="取消" click="PopUpManager.removePopUp(this);System.gc()"/>
+			<s:Button label="确定" id="ok" click="changeData();System.gc();dispose()"/>
+			<s:Button label="取消" id="cancel" click="PopUpManager.removePopUp(this);System.gc();dispose()"/>
 		</s:HGroup>
 		<mx:TabNavigator id="tn" height="100%" width="100%" color="0x323232"/>
 	</s:VGroup>

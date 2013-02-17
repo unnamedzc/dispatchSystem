@@ -35,6 +35,8 @@
 			private var _columns:Array=new Array()
 			private var dataArr:ArrayCollection=new ArrayCollection();
 			private var _tempStr:String;
+			
+			public var _editMode:uint;//0:增加数据，1：修改数据，2：查看数据,
 			//[Bindable]
 			//public var ac:ArrayCollection = new ArrayCollection(
 				//[{dateString:"11/12/2006", contact:"ABD DEF", dt: new Date(2004,11,2)}])
@@ -42,7 +44,6 @@
 			{
 				var _myScro:Scroller=new Scroller();
 				_myScro.viewport=MainSheet;
-				//_myScro._isSheet=1;
 				this.addElement(_myScro);
 				_myScro.percentWidth=110;
 				_myScro.percentHeight=100;
@@ -51,7 +52,10 @@
 			{	
 				//initData
 				//test
-				//dg.editable=false;
+				if(_editMode==2){
+					dg.editable=false;
+					addrow.visible=deleterow.visible=false
+				}
 				//for data
 				var _testStr:String;
 				_rowNum=_myXML.e.length();				
@@ -62,12 +66,15 @@
 					
 					GridName.dataField=i.toString();
 				 	if(_myXML.e[i].@name=="时间")
-					{						
-						var myDateField:ClassFactory = new ClassFactory(MyDateField);							
-						GridName.itemRenderer=myDateField;	
-						GridName.rendererIsEditor=true;
-						GridName.editorDataField="selectedDate";
-						GridName.width=String(_myXML.e[i].@name).length*60;
+					{	
+						if(_editMode!=2){
+							var myDateField:ClassFactory = new ClassFactory(MyDateField);							
+							GridName.itemRenderer=myDateField;	
+							GridName.rendererIsEditor=true;
+							GridName.editorDataField="selectedDate";
+							GridName.width=String(_myXML.e[i].@name).length*60;
+						}
+						
 					}else if(_myXML.e[i].@name=="行")
 					{
 						GridName.width=String(_myXML.e[i].@name).length*30;
@@ -98,7 +105,16 @@
 								如果添加了列，请在这里修改 date
 								*/
 								//将xml中的string型装换为date
-								_tempObj[j.toString()]=new Date(Date.parse(_testStr));
+								if(_editMode!=2){
+									_tempObj[j.toString()]=new Date(Date.parse(_testStr));
+								}else
+								{
+									
+									var tempD:Date=new Date(Date.parse(_testStr));
+									var tepStr:String=tempD.getFullYear().toString() + 
+										'/' + (tempD.getMonth()+1).toString() + '/' + tempD.getDate();
+									_tempObj[j.toString()]=tepStr;
+								}
 							}else
 							{								
 								if(_testStr!=""){
@@ -130,29 +146,7 @@
 			//增加一行空数据
 			private function addRow():void
 			{
-				var _len:uint=dataArr.length;				
-				/* if(_len>0)
-				{
-					var _prevLen:uint;
-					//for(var i:uint=1;i<_rowNum;++i)
-					//{
-					//	trace(dataArr[_len-1][i.toString()])
-						if(dataArr[_len-1]["1"]==undefined)
-						{
-							//_prevLen++;
-							Alert.buttonHeight=30;						
-							Alert.show('请填写时间!', '无法添加新数据');						
-							return;
-						} 
-				//	}
-					//if(_prevLen==_rowNum)
-					//{
-						//Alert.buttonHeight=30;						
-						//Alert.show('请在最新添加的数据行中至少填写一项数据!', '无法添加新数据');						
-						//return;
-					//}
-				}	 */
-				trace("dataArr.length:",_len)
+				var _len:uint=dataArr.length;	
 				var item:Object={"0":_len+1,"1":new Date()};
 				dataArr.addItem(item);
 				dg.dataProvider=dataArr;				
@@ -231,9 +225,9 @@
 	
 	<s:VGroup>
 		<s:HGroup>
-			<s:Button label="添加数据行" click="addRow()"/>
-			<s:Button label="删除数据行 " click="removeRow()"/>
-			<s:Button label="test" click="showSheetXML()"/>
+			<s:Button label="添加数据行" id="addrow" click="addRow()"/>
+			<s:Button label="删除数据行 " id="deleterow" click="removeRow()"/>
+			<!--<s:Button label="test" click="showSheetXML()"/>-->
 		</s:HGroup>
 		<s:Group id="MainSheet" width="100%" height="100%" creationComplete="assignScroll()">
 			<mx:DataGrid id="dg" draggableColumns="false" fontSize="15" editable="true" height="100%" creationComplete="creatData()"/>

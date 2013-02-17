@@ -8,17 +8,15 @@ package com.jeff.dataView.dataElement
 	
 	public class MyHGroupLabel extends FormItem
 	{
-		private var label2:IVisualElement
+		private var label2:IVisualElement;
+		
+		//public var _editMode:uint;//0:增加数据，1：修改数据，2：查看数据,
 		public function MyHGroupLabel($text1:String="",$text2:String="",$editable:Boolean=true)
 		{
-			if(!$editable)
-			{
-				label2=new Label();
-				Label(label2).text=$text2;
-			}else
-			{
-				label2=new TextInput();
-			}
+			label2=new TextInput();
+				
+			TextInput(label2).enabled=TextInput(label2).editable=$editable;
+			
 			//this.label=$text1
 			addElement(label2);
 			super();

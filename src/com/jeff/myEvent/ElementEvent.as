@@ -4,10 +4,13 @@ package com.jeff.myEvent
 	
 	public class ElementEvent extends Event
 	{
+		public var _obj:Object;
 		public static const UPDATE:String="update";
-		public function ElementEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false)
+		public static const CREATE_JPG:String="create jpg";
+		public function ElementEvent(type:String, $obj:Object=null, bubbles:Boolean=false, cancelable:Boolean=false)
 		{
-			super(type, bubbles, cancelable);
+			super(type);
+			_obj=$obj;
 		}
 	}
 }

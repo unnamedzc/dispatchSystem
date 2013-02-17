@@ -1,10 +1,13 @@
 package com.jeff.dataControler
 {
+	import Values.GlobalValue;
+	
 	import com.jeff.myEvent.XMLEvent;
 	
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.IEventDispatcher;
+	import flash.events.IOErrorEvent;
 	import flash.filesystem.File;
 	import flash.filesystem.FileMode;
 	import flash.filesystem.FileStream;
@@ -12,15 +15,14 @@ package com.jeff.dataControler
 	import flash.net.URLLoaderDataFormat;
 	import flash.net.URLRequest;
 	import flash.utils.ByteArray;
-	
-	import Values.GlobalValue;
+
 	public class DataManager extends EventDispatcher
 	{
 		private static var _instance:DataManager;
 		//the whole data that will be saved to file;
 		/*
 		 * 
-		<data>
+		<data jpgId=1>
 			<emp id=1>
 				<tab>
 					<姓名>
@@ -50,30 +52,55 @@ package com.jeff.dataControler
 			loader.dataFormat = URLLoaderDataFormat.BINARY;
 			var urlRequest:URLRequest = new URLRequest(_loadPath);
 			loader.addEventListener("complete",completeHandler);
+			loader.addEventListener(IOErrorEvent.IO_ERROR, ioErrorHandler);
 			loader.load(urlRequest);
 		}
+		
+		private function ioErrorHandler(e:IOErrorEvent):void
+		{
+			this.dispatchEvent(new XMLEvent(XMLEvent.XML_LOADED));
+		}
+		
 		private function completeHandler(e:Event):void
 		{	
 			if(e.currentTarget.data!=null)
 			{
-				var bytes:ByteArray = ByteArray(e.currentTarget.data);
-			
+				var bytes:ByteArray = ByteArray(e.currentTarget.data);			
 				var xmlStr:String = bytes.readMultiByte(bytes.length,"utf-8");
 				_wholeData = XML(xmlStr);
 				GlobalValue._empId=_wholeData.emp.length();
-				trace(_wholeData.emp.length());
+				//jpg id
+				//JpgManager.getInstance()._jpgId=_wholeData.@jpgId;
 				this.dispatchEvent(new XMLEvent(XMLEvent.XML_LOADED));
 			}
 		}
 		//save data 
-		public function saveData():void
+		public function saveData($type:uint=0):void
 		{
-			trace("save data");
+			//trace("save data");
 			var _xmlByteArray:ByteArray=new ByteArray();
+			//_wholeData.@jpgID;
+			//_wholeData.@jpgId=JpgManager.getInstance()._jpgId;
+			//trace(_wholeData.emp.length());
+			if(_wholeData.emp.length()==0)
+			{
+				return;
+			}
 			_xmlByteArray.writeUTFBytes(_wholeData.toString());
-			trace("_xmlByteArray Size is:",_xmlByteArray.length);
-			var _fl:File= new File(File.applicationDirectory.nativePath);
-			_fl = _fl.resolvePath(_loadPath);
+			//trace("_xmlByteArray Size is:",_xmlByteArray.length);
+			var _fl:File
+			if($type==0)
+			{
+				//save
+				_fl= new File(File.applicationDirectory.nativePath);
+				_fl = _fl.resolvePath(_loadPath);
+			}else
+			{
+				//copy
+				_fl= File.desktopDirectory.resolvePath(_loadPath);
+			}
+			//= new File(File.applicationDirectory.nativePath);
+			
 		//	var file:File = File.documentsDirectory.resolvePath("DeleteMe.txt");
 			if(_fl.exists)
 			{
@@ -93,6 +120,15 @@ package com.jeff.dataControler
 				trace(e);  
 			} 
 			_xmlByteArray.clear();
+			//delete useless jpg;
+			var _len:uint=JpgManager.getInstance().deletePicVec.length
+			for(var i:uint=0;i<_len;++i)
+			{
+				trace("will delete:",JpgManager.getInstance().deletePicVec[i]);
+				var _tempID:String=JpgManager.getInstance().deletePicVec[i].toString();
+				JpgManager.getInstance().deleteJpg(_tempID);
+			}
+			JpgManager.getInstance().deletePicVec=new Vector.<uint>;
 			
 		}
 		//combine emp Data

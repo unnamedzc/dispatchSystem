@@ -3,7 +3,7 @@
 <s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
 					   xmlns:s="library://ns.adobe.com/flex/spark"
 					   xmlns:mx="library://ns.adobe.com/flex/mx"
-					   xmlns:MyComponent="com.jeff.MyComponent.*" fontSize="20"  title="个体驾驶员信息系统v0.9" initialize="getData()" creationComplete="assignData()" resize="onResize()" xmlns:myComponents="myComponents.*">
+					   xmlns:MyComponent="com.jeff.MyComponent.*" fontSize="20"  title="个体驾驶员信息系统v1.0" initialize="getData()" creationComplete="assignData()" resize="onResize()" xmlns:myComponents="myComponents.*">
 	
 	<fx:Style>
 		@namespace "library://ns.adobe.com/flex/spark";
@@ -17,12 +17,12 @@
 			fontSize: 18;
 		} 	
 		
-		/*  NavigatorContent {
+		  NavigatorContent {
 			chromeColor: #9999CC;
 			color: #410FF5;
 			cornerRadius:8;
 			fontSize: 20;
-		}  */
+		}  
 	</fx:Style>
 	<!--DataManager 掌管所有data数据-->
 	<fx:Script>
@@ -30,6 +30,9 @@
 			import Values.GlobalValue;
 			
 			import com.jeff.dataControler.DataManager;
+			import com.jeff.dataControler.DataSearcher;
+			import com.jeff.dataControler.JpgManager;
+			import com.jeff.dataControler.PopUpAlertManager;
 			import com.jeff.myEvent.ElementEvent;
 			import com.jeff.myEvent.XMLEvent;
 			
@@ -37,11 +40,11 @@
 			import mx.core.IFlexDisplayObject;
 			import mx.managers.PopUpManager;
 			
-			import myComponents.LoadingTitleWin;
 			import myComponents.TitleWindows;
-			
+			import mx.controls.Alert;
 			import spark.components.TextArea;
 			private var addTileWin:TitleWindows;
+			
 			
 			public function getData():void
 			{
@@ -55,8 +58,9 @@
 				DataManager.getInstance().loadData();
 				DataManager.getInstance().addEventListener(XMLEvent.XML_LOADED,onXmlLoaded)
 				//mask when loading xml
-				GlobalValue._loadingMask=LoadingTitleWin(PopUpManager.createPopUp(this, LoadingTitleWin,true));	
-				PopUpManager.centerPopUp(GlobalValue._loadingMask);
+				PopUpAlertManager.getInstance().showLoading(this);	
+				/* GlobalValue._loadingMask=LoadingTitleWin(PopUpManager.createPopUp(this, LoadingTitleWin,true));	
+				PopUpManager.centerPopUp(GlobalValue._loadingMask); */
 			}
 			
 			private function loaderCompleteHandler(event:Event):void
@@ -114,7 +118,8 @@
 				if(_selectedId<0)
 				{
 					return;
-				}
+				}		
+			
 				//trace("delete:",mainTable.selectedIndex,DataManager.getInstance()._wholeData.emp.length());
 				var _empLen:uint=DataManager.getInstance()._wholeData.emp.length();
 				/*
@@ -132,24 +137,9 @@
 				
 				 */
 				//delete jpg file
-				var _flPic:File= new File(File.applicationDirectory.nativePath);
-				_flPic = _flPic.resolvePath("pic/"+_selectedId.toString()+"_pic.jpg");
-				if(_flPic.exists)
-				{
-					_flPic.deleteFile();
-				}				
-				var _flFinger:File= new File(File.applicationDirectory.nativePath);
-				_flFinger = _flFinger.resolvePath("pic/"+_selectedId.toString()+"_finger.jpg");
-				if(_flFinger.exists)
-				{
-					_flFinger.deleteFile();
-				}
-				var _flTrunk:File= new File(File.applicationDirectory.nativePath);
-				_flTrunk = _flTrunk.resolvePath("pic/"+_selectedId.toString()+"_trunk.jpg");
-				if(_flTrunk.exists)
-				{
-					_flTrunk.deleteFile();
-				}			
+				JpgManager.getInstance().deletePicVec.push(_selectedId);
+				//JpgManager.getInstance().deleteJpg(_selectedId.toString());
+						
 				//////////================================
 				_refreshMainTable();
 				/*
@@ -202,47 +192,71 @@
 				}
 			}
 			
-			private function savetest():void
+			private function savetest($type:uint=0):void
 			{
-				DataManager.getInstance().saveData();
+				DataManager.getInstance().saveData($type);
+				if($type==1)
+				{
+					//copy
+					Alert.buttonHeight=30;						
+					Alert.show('    备份文件已经保存至桌面database文件夹中，请妥善保存', '备份完成');
+				}
+			}
+			
+			private function onClickList():void
+			{
+				var _passId:uint=searchList.selectedIndex
+				//trace(_passId,DataSearcher.returnId(_passId));
+				//for test todo debug here.
+				GlobalValue._selectedMainSheetID=DataSearcher.returnId(_passId);
+				addTitleWin(2);
 			}
 		]]>
 	</fx:Script>
 	<s:layout>
 		<s:VerticalLayout paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="10"/>
 	</s:layout>
-	
 	<mx:HDividedBox width="100%" height="100%">				
-			<s:VGroup width="35%" height="100%">
-				<s:VGroup >										
-					<s:DropDownList id="direction" prompt="请选择查找类型">
-						<s:dataProvider>
-							<mx:ArrayList>
-								<fx:String>姓名</fx:String>
-								<fx:String>身份证号</fx:String>
-								<fx:String>手机号</fx:String>
-								<fx:String>固定电话</fx:String>
-								<fx:String>驾驶证</fx:String>
-							</mx:ArrayList>
-						</s:dataProvider>
-					</s:DropDownList>						
-					<s:HGroup>
-						<s:TextInput id="searchText"/>
-						<s:Button label="查询"/>
-					</s:HGroup>					
-				</s:VGroup>				
-				<s:List height="100%" width="100%"/>			
-			</s:VGroup>		
-			<!--右边主控制区域-->
-			<s:VGroup width="65%" height="100%">
-				<s:HGroup>
-					<s:Button label="添加" click="addTitleWin()"/>
-					<s:Button label="删除" click="deleteRow()"/>
-					<s:Button label="修改" click="addTitleWin(1)"/>
-					<s:Button label="查看xml" click="addTestWin()"/>
-					<s:Button label="saveTest" click="savetest()"/>
-				</s:HGroup>
+		<s:VGroup width="35%" height="100%">
+					
+			<s:HGroup>			
+				<s:Button width="55" height="58" label="保存数据"  click="savetest(0)" icon="../assets/save.jpg"/>
+				<s:Button width="55" height="58" label="备份数据"  click="savetest(1)" icon="../assets/backUp.jpg"/>
+			</s:HGroup>	
+			<s:Line xFrom="0" xTo="400">
+				<s:stroke>
+					<s:SolidColorStroke color="0x000000" weight=".1"/>
+				</s:stroke>
+			</s:Line>
+			<s:DropDownList id="direction" selectedIndex="0" width="120" change="DataSearcher._searchID=direction.selectedIndex">
+				<s:dataProvider>
+					<mx:ArrayList>
+						<fx:String>姓名</fx:String>
+						<fx:String>身份证号</fx:String>
+						<fx:String>手机号</fx:String>
+						<fx:String>固定电话</fx:String>
+						<fx:String>驾驶证号</fx:String>
+					</mx:ArrayList>
+				</s:dataProvider>
+			</s:DropDownList>						
+			<s:HGroup>
+				<s:TextInput id="searchText"/>
+				<s:Button label="查询" click="DataSearcher.searchData(searchText.text);searchList.dataProvider=new ArrayList(DataSearcher._listData);"/>
+			</s:HGroup>					
+								
+			<s:List id="searchList" height="100%" width="100%" click="onClickList()"/>			
+		</s:VGroup>		
+		<!--右边主控制区域-->
+		<s:VGroup width="65%" height="100%">
+			<s:HGroup>					
+				<s:Button label="添加" click="addTitleWin()"/>
+				<s:Button label="删除" click="deleteRow()"/>
+				<s:Button label="修改" click="addTitleWin(1)"/>	
+				<s:Button label="查看" click="addTitleWin(2)"/>
+				<!--<s:Button label="查看xml" click="addTestWin()"/>-->
+			</s:HGroup>
 				<myComponents:MainSheet id="mainTable" width="100%" height="100%"/>
-			</s:VGroup>				
-	</mx:HDividedBox>		
+		</s:VGroup>				
+	</mx:HDividedBox>	
+		
 </s:WindowedApplication>

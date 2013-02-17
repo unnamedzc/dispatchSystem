@@ -17,18 +17,13 @@ package com.jeff.dataView.dataElement
 	{
 		private var label2:IVisualElement;
 		private var label1:Label=new Label();
+		
+		//public var _editMode:uint;//0:增加数据，1：修改数据，2：查看数据,
 		public function MyVGroupText($text1:String="",$text2:String="",$editable:Boolean=true)
 		{						
-			if(!$editable)
-			{
-				label2=new TextArea();
-				Label(label2).text=$text2;
-				label2.width=2000;
-				label2.height=200;
-			}else
-			{
-				label2=new TextArea();
-			}
+			
+			label2=new TextArea();
+			TextArea(label2).editable=TextArea(label2).editable=$editable;
 			label1.text=$text1;
 			
 			addElement(label1);

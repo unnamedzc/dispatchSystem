@@ -6,32 +6,42 @@
 		<![CDATA[
 			import Values.GlobalValue;
 			
+			import com.jeff.dataControler.JpgManager;
+			import com.jeff.dataControler.PopUpAlertManager;
 			import com.jeff.myEvent.ElementEvent;
 			
-			import mx.collections.ArrayCollection;
-			import mx.controls.Alert;
-			import mx.events.FlexEvent;
 			import mx.graphics.codec.JPEGEncoder;
 			import mx.managers.DragManager;
-			import mx.managers.PopUpManager;
-			
-			import myComponents.LoadingTitleWin;
 			
 			import spark.events.IndexChangeEvent;
 			
 			//private var fileArray:ArrayCollection;
+			private var imgByteArray:ByteArray 
 			[Bindable]
 			private var ImageUrl:String;
 			//name extend 			
 			public var _extendName:String="default.jpg";
 			
+			private var _dragedImage:Boolean=false;
+			
+			public var _editMode:uint;//0:增加数据，1：修改数据，2：查看数据,
 			protected function addedToCom():void
 			{
-				addEventListener(NativeDragEvent.NATIVE_DRAG_ENTER, dragEnter);
-				addEventListener(NativeDragEvent.NATIVE_DRAG_DROP, dragDrop);
-				//fileArray = new ArrayCollection();
-				//fileList.dataProvider = fileArray;
+				if(_editMode!=2){
+					addEventListener(NativeDragEvent.NATIVE_DRAG_ENTER, dragEnter);
+					addEventListener(NativeDragEvent.NATIVE_DRAG_DROP, dragDrop);		
+					//save jpg
+					addEventListener(ElementEvent.CREATE_JPG,createJpg);
+				}
+				//if(imgByteArray)
+				//trace("check byteArray:",this,imgByteArray.position)
+			}
 			
+			private function initTex():void
+			{
+				if(_editMode==2){
+					note.text="无图片"
+				}
 			}
 			
 			private function dragEnter(e:NativeDragEvent):void
@@ -54,36 +64,21 @@
 							
 						ImageUrl=file.nativePath;
 						startImage.source=ImageUrl;
-						GlobalValue._loadingMask=LoadingTitleWin(PopUpManager.createPopUp(this, LoadingTitleWin,true));	
-						PopUpManager.centerPopUp(GlobalValue._loadingMask);					
+						
+						_dragedImage=true;
+						PopUpAlertManager.getInstance().showLoading(this)
+						/* GlobalValue._loadingMask=LoadingTitleWin(PopUpManager.createPopUp(this, LoadingTitleWin,true));	
+						PopUpManager.centerPopUp(GlobalValue._loadingMask);	 */		
 					}
 				}
 			}
 			
 			/*
-			完成加载后将图片缓存到本地  
+			点击确定按钮，保存图片及名字
 			*/
-			private function saveJpg(e:Event):void
+			private function createJpg(e:ElementEvent):void
 			{
-				//trace(startImage.source,(e.target.content  as Bitmap).width);
-				var _height:uint=(e.target.content  as Bitmap).height;
-				var _width:uint=(e.target.content  as Bitmap).width;
-				var bitmapData:BitmapData=new BitmapData(_width,_height);
-						
-				bitmapData.draw(Image(startImage));
-				var jpgenc:JPEGEncoder;
-				var imgByteArray:ByteArray 
-				if(_height>500||_width>500){
-					var copybitmapData:BitmapData=scaleBitmapData(bitmapData,.5,.5);
-					//trace(file.name,bitmapData);
-					jpgenc = new JPEGEncoder(30);
-					imgByteArray = jpgenc.encode(copybitmapData);
-				}else
-				{
-					jpgenc = new JPEGEncoder(50);
-					imgByteArray = jpgenc.encode(bitmapData);
-				}
-				//				
+				_extendName=JpgManager.getInstance().setJpgPath(e.target.title,e._obj.toString());
 				var fl:File 
 				if(GlobalValue._debug)
 				{
@@ -107,6 +102,56 @@
 				}catch(e:Error){  
 					trace(e);  
 				} 
+				imgByteArray.clear();
+			}
+			
+			/*
+			完成加载后将图片缓存到本地  
+			*/
+			private function saveJpg(e:Event):void
+			{				
+				var _height:uint=(e.target.content  as Bitmap).height;
+				var _width:uint=(e.target.content  as Bitmap).width;
+				var bitmapData:BitmapData=new BitmapData(_width,_height);
+						
+				bitmapData.draw(Image(startImage));
+				var jpgenc:JPEGEncoder;
+				//var imgByteArray:ByteArray 
+				if(_height>500||_width>500){
+					var copybitmapData:BitmapData=scaleBitmapData(bitmapData,.5,.5);
+					//trace(file.name,bitmapData);
+					jpgenc = new JPEGEncoder(30);
+					imgByteArray = jpgenc.encode(copybitmapData);
+				}else
+				{
+					jpgenc = new JPEGEncoder(50);
+					imgByteArray = jpgenc.encode(bitmapData);
+				}
+				//				
+				/* var fl:File 
+				if(GlobalValue._debug)
+				{
+					fl= File.desktopDirectory.resolvePath(_extendName);
+				}else
+				{
+					fl = new File(File.applicationDirectory.nativePath);
+					fl = fl.resolvePath(_extendName);
+					
+					//fl= File.applicationDirectory.resolvePath(_extendName);
+					trace("extend:",fl.nativePath);
+				}
+				var fs:FileStream = new FileStream();
+				try{  
+					//open file in write mode  
+					fs.open(fl,FileMode.WRITE);  
+					//write bytes from the byte array  
+					fs.writeBytes(imgByteArray);  
+					//close the file  
+					fs.close();  
+				}catch(e:Error){  
+					trace(e);  
+				} 
+				imgByteArray.clear(); */
 				//加载完成，隐藏mask
 				if(GlobalValue._loadingMask)
 				{
@@ -119,9 +164,9 @@
 			{
 				var matrix:Matrix = new Matrix();
 				matrix.scale(scaleX, scaleY);
-				var bmpData_:BitmapData = new BitmapData(scaleX * bmpData.width, scaleY * bmpData.height, true, 0);
-				bmpData_.draw(bmpData, matrix);
-				return bmpData_;
+				var _bmpData:BitmapData = new BitmapData(scaleX * bmpData.width, scaleY * bmpData.height, true, 0);
+				_bmpData.draw(bmpData, matrix);
+				return _bmpData;
 			}
 			
 			protected function fileList_changeHandler(event:IndexChangeEvent):void
@@ -135,8 +180,13 @@
 			}
 			
 			public function getURL():String
-			{				
-				return _extendName;
+			{	
+				if(_dragedImage){
+					return _extendName;
+				}else
+				{
+					return "";
+				}
 			}
 			
 			//只在编辑的时候有用，用于添加图片到image里面。
@@ -145,8 +195,21 @@
 				ImageUrl=$tex;
 				startImage.source=ImageUrl;
 				//trace("in DragImage:",ImageUrl)
-			}			
+			}	
+
+			public function get dragedImage():Boolean
+			{
+				return _dragedImage;
+			}
 			
+			public function dispose():void
+			{
+				imgByteArray.clear();
+				removeEventListener(NativeDragEvent.NATIVE_DRAG_ENTER, dragEnter);
+				removeEventListener(NativeDragEvent.NATIVE_DRAG_DROP, dragDrop);		
+				//save jpg
+				removeEventListener(ElementEvent.CREATE_JPG,createJpg);
+			}
 		]]>
 	</fx:Script>
 	
@@ -180,7 +243,7 @@
 	
 	<mx:ViewStack id="startVS" width="100%" height="100%" creationPolicy="all">
 		<mx:Canvas width="100%" height="100%">
-			<mx:Text verticalCenter="0" horizontalCenter="0">
+			<mx:Text id="note" verticalCenter="0" horizontalCenter="0" creationComplete="initTex()">
 				<mx:htmlText><![CDATA[<font size="20"><b>拖动照片到这里</b></font>]]></mx:htmlText>
 			</mx:Text>
 		</mx:Canvas>

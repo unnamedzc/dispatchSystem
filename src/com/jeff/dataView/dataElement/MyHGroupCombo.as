@@ -13,12 +13,20 @@ package com.jeff.dataView.dataElement
 		private var _depts:ArrayCollection = new ArrayCollection([
 			{label:"是", data:1}, 
 			{label:"否", data:2},]);
-		public function MyHGroupCombo($text:String="")
+		
+		//public var _editMode:uint;//0:增加数据，1：修改数据，2：查看数据,
+		public function MyHGroupCombo($text:String="",$editable:Boolean=true)
 		{
 			this.label=$text
-			addElement(DDList);
-			DDList.dataProvider=_depts;
-			DDList.selectedIndex=0;
+			if($editable){
+				addElement(DDList);
+				DDList.dataProvider=_depts;
+				DDList.selectedIndex=0;
+			}
+			else
+			{
+				
+			}
 			super();
 		}
 		public function getTitle():String

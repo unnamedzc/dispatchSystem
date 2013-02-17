@@ -9,6 +9,7 @@
 		<![CDATA[
 			import Values.GlobalValue;
 			
+			import com.jeff.dataControler.JpgManager;
 			import com.jeff.dataView.dataElement.MyHGroupCombo;
 			import com.jeff.dataView.dataElement.MyHGroupLabel;
 			import com.jeff.dataView.dataElement.MyVGroupText;
@@ -22,6 +23,8 @@
 			
 			public var _tabData:XML=<tab></tab>;
 			private var _testXML:XML;
+			
+			public var _editMode:uint;//0:增加数据，1：修改数据，2：查看数据,
 			//public var _mainTab:XML=<mainTab></mainTab>;
 			public var _tabID:uint;
 			private var _layoutStyle:uint;
@@ -50,39 +53,53 @@
 						//trace("testXML in TableTab:",_testXML,_testStr=_testXML.elements("*")[i]);
 					if(_myXML.e[i].@isUrl=="1"){
 						var myI:DragImage=new DragImage();
+						myI._editMode=_editMode;
 						_eleVec.push(myI);
+						
 						myI.title=_myXML.e[i].@name;
-						//myI url
-						if(myI.title=="照片")
-						{
-							myI._extendName="pic/"+String(GlobalValue._empId)+"_pic.jpg";
-						}else if(myI.title=="指纹")
-						{
-							myI._extendName="pic/"+String(GlobalValue._empId)+"_finger.jpg";
-						}else if(myI.title=="车辆照片")
-						{
-							myI._extendName="pic/"+String(GlobalValue._empId)+"_trunk.jpg";
-						}
+						
+						JpgManager.getInstance().dragImageVec.push(myI);						
+						
+											
+						//=================================
 						_myScro._mysubG2.addElement(myI);
 						myI.setText(_testStr);						
 					}
 					else if(_myXML.e[i].@isComBox=="1"){
-						var myC:MyHGroupCombo=new MyHGroupCombo(_myXML.e[i].@name);
+						var myC:IVisualElement
+						if(_editMode==2){
+							myC=new MyHGroupLabel(_myXML.e[i].@name,"111",false);
+							MyHGroupLabel(myC).label=_myXML.e[i].@name;
+							MyHGroupLabel(myC).setText(_testStr);
+						}else
+						{
+							myC=new MyHGroupCombo(_myXML.e[i].@name);
+							
+							MyHGroupCombo(myC).label=_myXML.e[i].@name
+							MyHGroupCombo(myC).setText(_testStr);
+						}
 						_eleVec.push(myC);
-						MyHGroupCombo(myC).label=_myXML.e[i].@name
 						_myScro._myForm.addElement(myC);						
-						myC.setText(_testStr);
+						
 					}else
 					{
 						var myE:IVisualElement
 						if(_layoutStyle==1)
 						{
-							myE=new MyHGroupLabel(_myXML.e[i].@name,"111");
+							if(_editMode==2){
+								myE=new MyHGroupLabel(_myXML.e[i].@name,"111",false);
+							}else{
+								myE=new MyHGroupLabel(_myXML.e[i].@name,"111");
+							}
 							MyHGroupLabel(myE).label=_myXML.e[i].@name;
 							MyHGroupLabel(myE).setText(_testStr);
 						}else
 						{
-							myE=new MyVGroupText(_myXML.e[i].@name,"111");
+							if(_editMode==2){
+								myE=new MyVGroupText(_myXML.e[i].@name,"111",false);
+							}else{
+								myE=new MyVGroupText(_myXML.e[i].@name,"111");
+							}
 							MyVGroupText(myE).setText(_testStr);
 						}
 						_eleVec.push(myE);						
@@ -142,9 +159,9 @@
 					{
 						//如果是增加模式，则添加数据
 						_tabData.appendChild(<{_tab}>{_info}</{_tab}>);	
-					}else
+					}else if($editMode==1)
 					{
-						//replace;xml.replace(1, <p>Bob</p>);
+						//修改模式
 						_tabData.replace(i,<{_tab}>{_info}</{_tab}>);	
 
 					}
