@@ -45,7 +45,7 @@
 			
 			import spark.components.TextArea;
 			private var addTileWin:TitleWindows;
-			
+			private const MAIN_ROW:uint=19
 			
 			public function getData():void
 			{
@@ -83,8 +83,9 @@
 			private function addTitleWin($mode:uint=0):void
 			{		
 				//$mode=0:add 1:edit 2:check
-				//trace(GlobalValue._selectedMainSheetID)
-				if(DataManager.getInstance()._wholeData.emp.length()==0&&$mode>0)
+				var _len:uint=DataManager.getInstance()._wholeData.emp.length();
+				
+				if(_len==0&&$mode>0)
 				{
 					Alert.buttonHeight=30;						
 					Alert.show('    数据库里面没有数据', '请输入数据');
@@ -172,7 +173,11 @@
 			private function _refreshMainTable(e:XMLEvent=null):void
 			{				
 				//trace("in Main:",DataManager.getInstance()._wholeData);
-				mainTable.dataProvider= DataManager.getInstance()._wholeData.emp.mainTab;					
+				mainTable.dataProvider= DataManager.getInstance()._wholeData.emp.mainTab;	
+				if( DataManager.getInstance()._wholeData.emp.length()>MAIN_ROW){
+					//change scroll
+					mainTable.verticalScrollPosition= DataManager.getInstance()._wholeData.emp.length()-MAIN_ROW;
+				}
 			}
 			//test
 			private function addTestWin():void
