@@ -2,6 +2,7 @@ package com.jeff.dataControler
 {
 	import Values.GlobalValue;
 	
+	import com.jeff.myEvent.ElementEvent;
 	import com.jeff.myEvent.XMLEvent;
 	
 	import flash.events.Event;
@@ -77,7 +78,9 @@ package com.jeff.dataControler
 		//save data 
 		public function saveData($type:uint=0):void
 		{
-			//trace("save data");
+			//
+			
+			//
 			var _xmlByteArray:ByteArray=new ByteArray();
 			//_wholeData.@jpgID;
 			//_wholeData.@jpgId=JpgManager.getInstance()._jpgId;
@@ -129,6 +132,12 @@ package com.jeff.dataControler
 				JpgManager.getInstance().deleteJpg(_tempID);
 			}
 			JpgManager.getInstance().deletePicVec=new Vector.<uint>;
+			
+			// finish save 
+			if(GlobalValue._loadingMask)
+			{
+				GlobalValue._loadingMask.dispatchEvent(new ElementEvent("update"));
+			}
 			
 		}
 		//combine emp Data

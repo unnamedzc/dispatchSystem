@@ -13,6 +13,11 @@
 				GlobalValue._selectedMainSheetID=this.selectedIndex;
 				//trace("ss",this.selectedItem,this.selectedIndex)
 			}
+			
+			private function doubeClick():void
+			{
+				trace("doble")
+			}
 		]]>
 	</fx:Script>
 	<mx:columns>

@@ -91,7 +91,11 @@
 				addTileWin.addEventListener(XMLEvent.DATA_COMBINED,_refreshMainTable)
 				addTileWin.x=20;
 				addTileWin.y=20;
-				_resizeAllComponent()
+				_resizeAllComponent();
+				if($mode!=2)
+				{
+					removeListData();
+				}
 			}
 			
 			private function _resizeAllComponent():void
@@ -119,7 +123,7 @@
 				{
 					return;
 				}		
-			
+				removeListData();
 				//trace("delete:",mainTable.selectedIndex,DataManager.getInstance()._wholeData.emp.length());
 				var _empLen:uint=DataManager.getInstance()._wholeData.emp.length();
 				/*
@@ -194,6 +198,7 @@
 			
 			private function savetest($type:uint=0):void
 			{
+				PopUpAlertManager.getInstance().showLoading(this)
 				DataManager.getInstance().saveData($type);
 				if($type==1)
 				{
@@ -210,6 +215,17 @@
 				//for test todo debug here.
 				GlobalValue._selectedMainSheetID=DataSearcher.returnId(_passId);
 				addTitleWin(2);
+			}
+			
+			private function doubleClick():void
+			{
+				//trace("dd:",GlobalValue._selectedMainSheetID);
+				addTitleWin(2);
+			}
+			
+			private function removeListData():void
+			{
+				searchList.dataProvider=new ArrayList(null);
 			}
 		]]>
 	</fx:Script>
@@ -255,7 +271,7 @@
 				<s:Button label="查看" click="addTitleWin(2)"/>
 				<!--<s:Button label="查看xml" click="addTestWin()"/>-->
 			</s:HGroup>
-				<myComponents:MainSheet id="mainTable" width="100%" height="100%"/>
+				<myComponents:MainSheet id="mainTable" width="100%" height="100%" doubleClickEnabled="true" doubleClick="doubleClick()"/>
 		</s:VGroup>				
 	</mx:HDividedBox>	
 		

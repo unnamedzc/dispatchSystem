@@ -40,13 +40,37 @@ package com.jeff.dataControler
 			{
 				//trace(DataManager.getInstance()._wholeData.emp[i].mainTab.elements("*")[unit]);
 				//todo模糊查询
-				if($searchStr==DataManager.getInstance()._wholeData.emp[i].mainTab.elements("*")[unit])
+				containStr($searchStr,DataManager.getInstance()._wholeData.emp[i].mainTab.elements("*")[unit])
+				if(containStr($searchStr,DataManager.getInstance()._wholeData.emp[i].mainTab.elements("*")[unit]))
 				{
 					//var _obj:Object={show:DataManager.getInstance()._wholeData.emp[i].mainTab.elements("*")[unit],id:i}
 					_listData.push(DataManager.getInstance()._wholeData.emp[i].mainTab.elements("*")[unit]);
 					_listID.push(i);
 				}					
 			}
+		}
+		
+		private static function containStr($str:String,$str2:String):Boolean
+		{
+			var _bol:Boolean=false;
+			/*var _len:uint=$str2.length;
+			var _len2:uint=$str.length;
+			var myPattern:RegExp = /{$str}/g; 
+			trace($str2.match(myPattern));*/
+			//var ss:String="here is my home,she is my wife.";
+			//var s:String="is"
+			var reg:RegExp = new RegExp($str, "\g");
+			trace("运行后="+$str2.search(reg));//返回第一个与'my'匹配的ss索引
+			var _B:int=$str2.search(reg)
+			/*for(var i:uint=0;i<_len;++i)
+			{
+				for(var j:uint;j<_len2;++i)
+				{
+					
+				}
+			}*/
+			_B>=0?_bol=true:_bol=false
+			return _bol
 		}
 		
 		public static function returnId($id:uint):uint

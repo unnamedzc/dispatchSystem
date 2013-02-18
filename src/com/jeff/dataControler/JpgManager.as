@@ -30,7 +30,7 @@ package com.jeff.dataControler
 			}
 			return _instance;
 		}
-		//todo jpg path anylize
+		 
 		public function setJpgPath($title:String,$id:String):String
 		{
 			var _tempStr:String;
